@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+	<session-factory>
+			
+		<property name="hibernate.show_sql">false</property>
+		<property name="format_sql">update</property>
+		
+		<property name="hibernate.hbm2ddl.auto">validate</property>
+  		<property name="hibernate.max_fetch_depth">3</property>
+	    <property name="transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</property>
+		<property name="current_session_context_class">thread</property>
+		<property name="hibernate.jdbc.batch_size">0</property>
+	  	<property name="hibernate.cache.use_second_level_cache">false</property>
+		<property name="hibernate.cache.provider_class">org.hibernate.cache.HashtableCacheProvider</property>		  		
+		
+		<property name="hibernate.connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
+		<property name="hibernate.c3p0.acquire_increment">1</property>
+		<property name="hibernate.c3p0.idle_test_period">300</property>
+		<property name="hibernate.c3p0.timeout">1800</property>
+		<property name="hibernate.c3p0.max_size">25</property>
+		<property name="hibernate.c3p0.min_size" >1</property>
+		<property name="hibernate.c3p0.max_statement">0</property>
+		<property name="hibernate.c3p0.preferredTestQuery">select 1;</property>
+		<property name="hibernate.c3p0.validate">true</property>
+		
+		<mapping class="br.com.cardeal.model.User" />
+ 		<mapping class="br.com.cardeal.model.Product" />
+ 		<mapping class="br.com.cardeal.model.Company" />
+ 		<mapping class="br.com.cardeal.model.Partner" />
+ 		<mapping class="br.com.cardeal.model.Unit" />
+ 		<mapping class="br.com.cardeal.model.Profile" />
+ 		<mapping class="br.com.cardeal.model.Stock" />
+ 		<mapping class="br.com.cardeal.model.Historic" />
+ 		<mapping class="br.com.cardeal.model.Order" />
+ 		<mapping class="br.com.cardeal.model.OrderItem" />
+ 		<mapping class="br.com.cardeal.model.PurchaseOrder" />
+ 		<mapping class="br.com.cardeal.model.PurchaseOrderItem" />
+ 		<mapping class="br.com.cardeal.model.Terminal" />
+ 		<mapping class="br.com.cardeal.model.Pallet" />
+ 		<mapping class="br.com.cardeal.model.ServerSetup" />
+ 		<mapping class="br.com.cardeal.model.ControlAccess" />
+ 		<mapping class="br.com.cardeal.model.Enterprise" />
+ 		<mapping class="br.com.cardeal.model.IdentifyLogisticProduct" />
+		<mapping class="br.com.cardeal.model.IdentifyLogisticPallet" />
+		<mapping class="br.com.cardeal.model.Etiqueta" />
+		<mapping class="br.com.cardeal.model.UserInProcess" />
+		<mapping class="br.com.cardeal.model.ShipmentItensDevolutionDetails" />
+														
+	</session-factory>
+
+</hibernate-configuration>
