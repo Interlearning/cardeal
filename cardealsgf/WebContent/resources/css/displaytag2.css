@@ -1,0 +1,113 @@
+.displayTable table {
+	border: 1px solid #666;
+	width: 80%;
+	margin: 20px 0 20px 0 !important;
+}
+
+.displayTable  th, .displayTable  td {
+	padding: 2px 4px 2px 4px !important;
+	text-align: left;
+	vertical-align: top;
+}
+
+.displayTable  thead tr {
+	/* background-color: #fc0; */ 
+	/* background-color: #ffef7f; */ 
+	background-color: #80b645;  
+}
+
+.displayTable  th.sorted {
+	background-color: orange;
+}
+
+.displayTable  th a,.displayTable  th a:visited {
+	color: black;
+}
+
+.displayTable th a:hover {
+	text-decoration: underline;
+	color: black;
+}
+
+.displayTable  th.sorted a,.displayTable  th.sortable a {
+	background-position: right;
+	display: block;
+	width: 100%;
+}
+
+.displayTable  th.sortable a {
+	background: url(../img/arrow_off.png) no-repeat right center ;
+}
+
+.displayTable  th.order1 a {
+	background: url(../img/arrow_down.png) no-repeat right center ;
+}
+
+.displayTable  th.order2 a {
+	background: url(../img/arrow_up.png) no-repeat right center;
+}
+
+.displayTable  tr.odd {
+	background-color: #fff
+}
+
+.displayTable  tr.tableRowEven,.displayTable tr.even {
+	/*background-color: #fea;*/
+	background-color: #c2dca7;
+
+}
+
+.displayTable  div.exportlinks {
+	background-color: #eee;
+	border: 1px dotted #999;
+	padding: 2px 4px 2px 4px;
+	margin: 2px 0 10px 0;
+	width: 79%;
+}
+
+.displayTable  span.export {
+	padding: 0 4px 1px 20px;
+	display: inline;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.displayTable  span.excel {
+	background-image: url(../img/ico_file_excel.png);
+}
+
+.displayTable span.csv {
+	background-image: url(../img/ico_file_csv.png);
+}
+
+.displayTable span.xml {
+	background-image: url(../img/ico_file_xml.png);
+}
+
+.displayTable span.pdf {
+	background-image: url(../img/ico_file_pdf.png);
+}
+
+.displayTable span.rtf {
+	background-image: url(../img/ico_file_rtf.png);
+}
+
+.displayTable span.pagebanner {
+	background-color: #eee;
+	border: 1px dotted #999;
+	padding: 2px 4px 2px 4px;
+	width: 79%;
+	margin-top: 10px;
+	display: block;
+	border-bottom: none;
+}
+
+.displayTable span.pagelinks {
+	background-color: #eee;
+	border: 1px dotted #999;
+	padding: 2px 4px 2px 4px;
+	width: 79%;
+	display: block;
+	border-top: none;
+	margin-bottom: -5px;
+}
