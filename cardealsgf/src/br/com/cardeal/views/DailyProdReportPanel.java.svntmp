@@ -1,0 +1,470 @@
+package br.com.cardeal.views;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Date;
+import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
+import javax.swing.table.TableModel;
+import br.com.cardeal.filter.StockFilter;
+import br.com.cardeal.globals.DateTimeUtils;
+import br.com.cardeal.globals.GuiGlobals;
+import br.com.cardeal.table.TableProdModel;
+import br.com.cardeal.table.TempTableEmptyModel;
+import br.com.cardeal.model.StockTotal;
+import br.com.cardeal.model.Terminal;
+
+import javax.swing.JScrollPane;
+
+import java.awt.Rectangle;
+
+import javax.swing.JTable;
+
+public class DailyProdReportPanel extends JPanel implements OperationWindow {
+
+	private static final long serialVersionUID = 1L;
+	private JTextField txtDay;
+	private JTextField txtMonth;
+	private JTextField txtYear;
+	private JTextField txtDay_2;
+	private JTextField txtMonth_2;
+	private JTextField txtYear_2;
+
+	@SuppressWarnings({ "rawtypes" })
+	private JTextField txtTerminal;
+	private JTextField txtTerminal_2;
+	private JTable table;
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public DailyProdReportPanel() {
+		setBorder(new LineBorder(new Color(0, 0, 0)));
+		setBounds(0, 59, 1018, 600);
+		setLayout(null);
+		
+		JLabel label = new JLabel("Data De");
+		label.setFont(new Font("Tahoma", Font.BOLD, 24));
+		label.setBounds(12, 22, 95, 29);
+		add(label);
+		
+		txtDay = new JTextField();
+		txtDay.setEnabled(false);
+		txtDay.setHorizontalAlignment(SwingConstants.CENTER);
+		txtDay.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		txtDay.setColumns(10);
+		txtDay.setBounds(119, 10, 48, 51);
+		add(txtDay);
+		
+		JLabel label_2 = new JLabel("/");
+		label_2.setFont(new Font("Tahoma", Font.BOLD, 24));
+		label_2.setBounds(172, 21, 19, 29);
+		add(label_2);
+		
+		txtMonth = new JTextField();
+		txtMonth.setEnabled(false);
+		txtMonth.setHorizontalAlignment(SwingConstants.CENTER);
+		txtMonth.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		txtMonth.setColumns(10);
+		txtMonth.setBounds(190, 10, 48, 51);
+		add(txtMonth);
+		
+		JLabel label_3 = new JLabel("/");
+		label_3.setFont(new Font("Tahoma", Font.BOLD, 24));
+		label_3.setBounds(242, 21, 19, 29);
+		add(label_3);
+		
+		txtYear = new JTextField();
+		txtYear.setEnabled(false);
+		txtYear.setHorizontalAlignment(SwingConstants.CENTER);
+		txtYear.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		txtYear.setColumns(10);
+		txtYear.setBounds(259, 10, 85, 51);
+		add(txtYear);
+		
+		JButton button = new JButton("+");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				increaseDate();
+			}
+		});
+		button.setFont(new Font("Tahoma", Font.BOLD, 24));
+		button.setBounds(427, 10, 65, 51);
+		add(button);
+		
+		JButton button_1 = new JButton("-");
+		button_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				decreaseDate();
+			}
+		});
+		button_1.setFont(new Font("Tahoma", Font.BOLD, 24));
+		button_1.setBounds(356, 10, 65, 51);
+		add(button_1);
+		//
+		JLabel label_4 = new JLabel("Data Até");
+		label_4.setFont(new Font("Tahoma", Font.BOLD, 24));
+		label_4.setBounds(12, 79, 110, 29);
+		add(label_4);
+		
+		txtDay_2 = new JTextField();
+		txtDay_2.setEnabled(false);
+		txtDay_2.setHorizontalAlignment(SwingConstants.CENTER);
+		txtDay_2.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		txtDay_2.setColumns(10);
+		txtDay_2.setBounds(119, 70, 48, 51);
+		add(txtDay_2);
+		
+		JLabel label_5 = new JLabel("/");
+		label_5.setFont(new Font("Tahoma", Font.BOLD, 24));
+		label_5.setBounds(172, 82, 19, 29);
+		add(label_5);
+		
+		txtMonth_2 = new JTextField();
+		txtMonth_2.setEnabled(false);
+		txtMonth_2.setHorizontalAlignment(SwingConstants.CENTER);
+		txtMonth_2.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		txtMonth_2.setColumns(10);
+		txtMonth_2.setBounds(190, 70, 48, 51);
+		add(txtMonth_2);
+		
+		JLabel label_6 = new JLabel("/");
+		label_6.setFont(new Font("Tahoma", Font.BOLD, 24));
+		label_6.setBounds(242, 82, 19, 29);
+		add(label_6);
+		
+		txtYear_2 = new JTextField();
+		txtYear_2.setEnabled(false);
+		txtYear_2.setHorizontalAlignment(SwingConstants.CENTER);
+		txtYear_2.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		txtYear_2.setColumns(10);
+		txtYear_2.setBounds(259, 70, 85, 51);
+		add(txtYear_2);
+		
+		JButton button_3 = new JButton("+");
+		button_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				increaseDate_2();
+			}
+		});
+		button_3.setFont(new Font("Tahoma", Font.BOLD, 24));
+		button_3.setBounds(427, 70, 65, 51);
+		add(button_3);
+		
+		JButton button_4 = new JButton("-");
+		button_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				decreaseDate_2();
+			}
+		});
+		button_4.setFont(new Font("Tahoma", Font.BOLD, 24));
+		button_4.setBounds(356, 70, 65, 51);
+		add(button_4);
+		//
+		JButton btnSair = new JButton("Sair");
+		btnSair.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				GuiGlobals.getMain().exitOperation();
+			}
+		});
+		btnSair.setIcon(new ImageIcon(PackingPanel.class.getResource("/32x32/Exit.png")));
+		btnSair.setFont(new Font("Tahoma", Font.BOLD, 24));
+		btnSair.setBounds(234, 153, 210, 63);
+		add(btnSair);
+		
+		JButton btnSearch = new JButton("Pesquisar");
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showTotal();
+			}
+		});
+		btnSearch.setIcon(new ImageIcon(PackingPanel.class.getResource("/32x32/Apply.png")));
+		btnSearch.setFont(new Font("Tahoma", Font.BOLD, 24));
+		btnSearch.setBounds(12, 153, 210, 63);
+		add(btnSearch);
+		
+		
+		//--------------------------------------
+		//terminais
+		//--------------------------------------
+		
+		JLabel lblTerminal = new JLabel("Terminal De");
+		lblTerminal.setFont(new Font("Tahoma", Font.BOLD, 24));
+		lblTerminal.setBounds(540, 22, 150, 29);
+		add(lblTerminal);
+		
+//		final DefaultTxtTerminalModel model_3 = new DefaultTxtTerminalModel(getTerminals());
+		
+		txtTerminal = new JTextField();
+		txtTerminal.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(txtTerminal.isEnabled()) {
+					QuantityDlg dlg = new QuantityDlg(1, 
+							9999, 
+							txtTerminal(), 
+							"Terminal De");
+					dlg.setVisible(true);
+					if(dlg.isConfirmed()) {
+						txtTerminal.setText(String.valueOf(dlg.getValue()));
+					}					
+				}
+			}
+
+		});
+		txtTerminal.setHorizontalAlignment(SwingConstants.CENTER);
+		txtTerminal.setText("001");
+		txtTerminal.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		txtTerminal.setColumns(10);
+		txtTerminal.setBounds(700, 10, 150, 55);
+		add(txtTerminal);
+	
+//		cbTerminal = new JComboBox(model);
+//		cbTerminal.setFont(new Font("Tahoma", Font.PLAIN, 20));
+//		cbTerminal.setBounds(700, 10, 150, 55);
+//		add(cbTerminal);
+		
+		JLabel lblTerminal_2 = new JLabel("Terminal Até");
+		lblTerminal_2.setFont(new Font("Tahoma", Font.BOLD, 24));
+		lblTerminal_2.setBounds(540, 79, 160, 29);
+		add(lblTerminal_2);
+		
+//		final DefaultComboBoxModel model_2 = new DefaultComboBoxModel(getTerminals());
+
+//		cbTerminal_2 = new JComboBox(model_2);
+//		cbTerminal_2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+//		cbTerminal_2.setBounds(700, 70, 150, 55);
+//		add(cbTerminal_2);
+		
+		txtTerminal_2 = new JTextField();
+		txtTerminal_2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				if(txtTerminal_2.isEnabled()) {
+					QuantityDlg dlg = new QuantityDlg(1, 
+							9999, 
+							txtTerminal_2(), 
+							"Terminal Até");
+					dlg.setVisible(true);
+					if(dlg.isConfirmed()) {
+						txtTerminal_2.setText(String.valueOf(dlg.getValue()));
+					}					
+				}
+			}
+
+		});
+		txtTerminal_2.setHorizontalAlignment(SwingConstants.CENTER);
+		txtTerminal_2.setText("001");
+		txtTerminal_2.setFont(new Font("Tahoma", Font.PLAIN, 24));
+		txtTerminal_2.setColumns(10);
+		txtTerminal_2.setBounds(700, 70, 150, 55);
+		add(txtTerminal_2);
+		
+		//--------------------------------------
+		//grid
+		//--------------------------------------
+
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(new Rectangle(17, 69, 553, 72));
+		scrollPane.setBounds(12, 225, 994, 412);
+		add(scrollPane);
+		
+		table = new JTable();
+		scrollPane.setViewportView(table);
+	}
+
+	public String getTitle() {
+		return "Produção Diária";
+	}
+
+	public JPanel getPanel() {
+		return this;
+	}
+
+	public String getInitialMessage() {
+		return "";
+	}
+	
+	public void start() {
+		today();
+		today_2();
+	}
+	
+	private void today() {
+	// Carrega com a data atual o campo data De.	
+		txtDay.setText(DateTimeUtils.getCurrentDay());
+		txtMonth.setText(DateTimeUtils.getCurrentMonth());
+		txtYear.setText(DateTimeUtils.getCurrentYear());
+
+	}
+	
+	private void today_2() {
+	// Carrega com a data atual o campo data atï¿½.
+	    txtDay_2.setText(DateTimeUtils.getCurrentDay());
+	    txtMonth_2.setText(DateTimeUtils.getCurrentMonth());
+	    txtYear_2.setText(DateTimeUtils.getCurrentYear());
+	//
+	}
+	private void increaseDate() {
+	// Mï¿½todo de tratamento crescente refente o data De.
+		String previous = txtYear.getText() + txtMonth.getText() + txtDay.getText();
+		String result = DateTimeUtils.addDays(previous, 1);
+		if(result.equals(previous)) {
+			GuiGlobals.getMain().showMessage("A data informada é inválida");
+			return;
+		}
+		txtDay.setText(result.substring(6));
+		txtMonth.setText(result.substring(4, 6));
+		txtYear.setText(result.substring(0, 4));	
+	}
+	
+	private void increaseDate_2() {
+	// Mï¿½todo de tratamento crescente refente o data atï¿½.
+	    String previous_2 = txtYear_2.getText() + txtMonth_2.getText() + txtDay_2.getText();
+	    String result_2 = DateTimeUtils.addDays(previous_2, 1);
+	    if(result_2.equals(previous_2)) {
+		    GuiGlobals.getMain().showMessage("A data informada é inválida");
+		    return;
+	    }
+	    txtDay_2.setText(result_2.substring(6));
+	    txtMonth_2.setText(result_2.substring(4, 6));
+	    txtYear_2.setText(result_2.substring(0, 4));
+	//
+    }
+	private void decreaseDate() {
+	// Mï¿½todo de tratamento decrescente refente o data De.	
+		String previous = txtYear.getText() + txtMonth.getText() + txtDay.getText();
+		String result = DateTimeUtils.addDays(previous, -1);
+		if(result.equals(previous)) {
+			GuiGlobals.getMain().showMessage("A data informada é inválida");
+			return;
+		}
+		txtDay.setText(result.substring(6));
+		txtMonth.setText(result.substring(4, 6));
+		txtYear.setText(result.substring(0, 4));
+	}
+	
+	private void decreaseDate_2() {
+	// Mï¿½todo de tratamento decrescente refente o data atï¿½.
+	    String previous_2 = txtYear_2.getText() + txtMonth_2.getText() + txtDay_2.getText();
+	    String result_2 = DateTimeUtils.addDays(previous_2, -1);
+	    if(result_2.equals(previous_2)) {
+		    GuiGlobals.getMain().showMessage("A data informada é inválida");
+		    return;
+	    }
+	    txtDay_2.setText(result_2.substring(6));
+	    txtMonth_2.setText(result_2.substring(4, 6));
+	    txtYear_2.setText(result_2.substring(0, 4));
+	//
+	}
+	
+//	private Object[] getTerminals() {
+//		List<Terminal> terminals = GuiGlobals.getDaoFactory().getTerminalDao().list();
+//		Terminal all = new Terminal();
+//		all.setId("Todos");
+//		terminals.add(0, all);
+//		return terminals.toArray();
+//	}
+	
+	private void showTotal() {
+		GuiGlobals.waitCursor();
+		try {
+			clearTable();
+			List<StockTotal> total = searchProduction();
+			fillTable(total);
+		}
+		finally {
+			GuiGlobals.defaultCursor();
+		}
+	}
+	
+	private void clearTable() {
+		TableModel tableModel = table.getModel();
+		
+		//Se havia um total sendo mostrado, libera a memória
+		if(tableModel != null && tableModel instanceof TableProdModel) {
+			((TableProdModel)tableModel).setTotal(null);
+		}
+		
+		//Associa um modelo vazio ï¿½ tabela
+		TempTableEmptyModel empty = new TempTableEmptyModel();
+		table.setModel(empty);		
+	}
+	
+	private void fillTable(List<StockTotal> total) {
+		//limpa dados anteriores presentes na tabela
+		this.clearTable();
+
+		//Cria um modelo de tabela prï¿½prio
+		TableProdModel tableModel = new TableProdModel(total);
+		
+		//associa o modelo ï¿½ tabela
+		table.setModel(tableModel);
+		tableModel.initializeLayout(table);
+	}
+	
+	
+	
+	private List<StockTotal> searchProduction() {
+	// Tratamento de filtro entre datas de/atï¿½.
+		Date date1 = DateTimeUtils.buildInitDate(
+				Integer.parseInt(txtDay.getText()),
+				Integer.parseInt(txtMonth.getText()),
+				Integer.parseInt(txtYear.getText())
+				);
+		
+		Date date2 = DateTimeUtils.buildEndDate(
+				Integer.parseInt(txtDay_2.getText()),
+				Integer.parseInt(txtMonth_2.getText()),
+				Integer.parseInt(txtYear_2.getText())
+				);
+		
+	// Tratamento de filtro por terminal.
+		String terminal = txtTerminal.getText();
+		String terminal_2 = txtTerminal_2.getText();
+			//if("Todos".equals(terminalId))
+			//terminalId = null; 
+		
+		StockFilter filter = new StockFilter();
+		filter.setBatch(null);
+		filter.setDate1(date1);
+		filter.setDate2(date2);
+		filter.setOnlyStocked(false);
+		filter.setPartnerId(0);
+		filter.setProductId(0);
+		filter.setTerminalId(terminal);
+		filter.setTerminalId_2(terminal_2);
+		
+		List<StockTotal> total = GuiGlobals.getDaoFactory().getStockDao().totalize(filter);
+		return total; 
+	}
+	
+	private int txtTerminal() {
+		try {
+			int value = Integer.parseInt(txtTerminal.getText());
+			return value;
+		}
+		catch(Exception e) {
+			return 0;
+		}
+	}
+	
+	private int txtTerminal_2() {
+		try {
+			int value = Integer.parseInt(txtTerminal_2.getText());
+			return value;
+		}
+		catch(Exception e) {
+			return 0;
+		}
+	}
+	
+}
