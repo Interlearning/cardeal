@@ -18,7 +18,11 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+
 import br.com.cardeal.enums.PalletStatus;
 import br.com.cardeal.enums.StockStatus;
 import br.com.cardeal.enums.TypeStock;
@@ -32,6 +36,7 @@ import br.com.cardeal.model.Pallet;
 import br.com.cardeal.model.PurchaseOrder;
 import br.com.cardeal.model.Stock;
 import br.com.cardeal.model.StockTotal;
+import br.com.cardeal.model.StockTotalReport;
 import br.com.cardeal.model.Terminal;
 import br.com.cardeal.services.PalletService;
 import br.com.caelum.vraptor.ioc.Component;
@@ -114,6 +119,30 @@ public class DefaultStockDao implements StockDao
 		}
 	}
 	
+	public List<StockTotalReport> listSumStocked(StockFilter filter, boolean isGroupByProduct)
+	{
+		Criteria c = session.createCriteria(Stock.class, "stock");
+		
+		addConditionsByFilter(filter, c);
+		
+		ProjectionList proList = Projections.projectionList();
+		proList.add( Projections.count("id").as("totEmb") );
+		proList.add( Projections.sum("primaryQty").as("primaryQty") );
+		proList.add( Projections.sum("secondaryQty").as("secondaryQty") );
+		proList.add( Projections.sum("net").as("net") );
+		
+		if ( isGroupByProduct )
+			proList.add( Projections.property("product").as("product") );
+	
+		if ( isGroupByProduct )
+			proList.add( Projections.groupProperty("product") );
+		
+		c.setProjection(proList);
+		c.setResultTransformer(Transformers.aliasToBean(StockTotalReport.class));
+		
+	return (List<StockTotalReport>) c.list();
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Stock> list(StockFilter filter) 
@@ -122,112 +151,19 @@ public class DefaultStockDao implements StockDao
 		
 		if(filter != null) 
 		{
-			
-			int page = filter.getPage();
-			int qtyPerPage = LIST_STOCK_QTY_PER_PAGE;
-			if ( page > 0 )
+			if ( filter.isLimitPage() )
 			{
-				int firstResult = ( ( page == 1 ) ? 1 : ( ( page - 1 ) * qtyPerPage ) );
-				c.setFirstResult( firstResult );
-			}
-			c.setMaxResults( qtyPerPage );
-			
-			if(filter.isOnlyStocked())
-				c.add( Restrictions.eq("status", StockStatus.STOCKED) );
-			
-			if(filter.isOnlyFifo())
-				c.add( Restrictions.eq("inFifo", filter.isOnlyFifo() ) );
-			
-			if(filter.getId() > 0)
-				c.add(Restrictions.ge("id", filter.getId()));
-			
-			if(filter.getId_2() > 0)
-				c.add(Restrictions.le("id", filter.getId_2()));
-
-			if(filter.getProductId() > 0)
-				c.add(Restrictions.eq("product.id", filter.getProductId()));
-			
-			if( filter.getIdMasc() != null && !filter.getIdMasc().isEmpty() )
-			{
-				Product product = GuiGlobals.getDaoFactory().getProductDao().findByIdMasc( filter.getIdMasc() );
-				c.add(Restrictions.ge("product.id", product.getId()));
-			}
-			
-			if( filter.getIdMasc_2() != null && !filter.getIdMasc_2().isEmpty() )
-			{
-				Product product = GuiGlobals.getDaoFactory().getProductDao().findByIdMasc( filter.getIdMasc_2() );
-				c.add(Restrictions.le("product.id", product.getId()));
-			}
-			
-			if ( filter.getCompanyIdDe() != null && !filter.getCompanyIdDe().isEmpty() )
-				c.add(Restrictions.ge("company.id", filter.getCompanyIdDe()));
-			
-			if ( filter.getCompanyIdAte() != null && !filter.getCompanyIdAte().isEmpty() )
-				c.add(Restrictions.le("company.id", filter.getCompanyIdAte()));
-			
-			if( ( filter.getCompanyIdDe() != null && !filter.getCompanyIdDe().isEmpty() ) && ( filter.getTerminalId() != null && !filter.getTerminalId().isEmpty() ) ) {
-				
-				Terminal terminalDe = GuiGlobals.getDaoFactory().getTerminalDao().find(filter.getCompanyIdDe(), filter.getTerminalId());
-				
-				if ( terminalDe != null )
-					c.add(Restrictions.ge("terminal.id", terminalDe.getId()));
-			}
-						
-			if( ( filter.getCompanyIdAte() != null && !filter.getCompanyIdAte().isEmpty() ) && ( filter.getTerminalId_2() != null && !filter.getTerminalId_2().isEmpty() ) ){
-				
-				Terminal terminalAte = GuiGlobals.getDaoFactory().getTerminalDao().find( filter.getCompanyIdAte(), filter.getTerminalId_2());
-				
-				if ( terminalAte != null )
-					c.add(Restrictions.le("terminal.id", terminalAte.getId()));
-			}	
-
-			if(filter.getPartnerId() > 0)
-				c.add(Restrictions.eq("partner.id", filter.getPartnerId()));
-
-			if(filter.getBatch() != null && filter.getBatch().length() > 0)
-				c.add(Restrictions.eq("batch", filter.getBatch()));
-			
-			if(filter.getEnterDateDe() != null)
-				c.add(Restrictions.ge("enterDate", filter.getEnterDateDe()));
-			
-			if(filter.getEnterDateAte() != null) 
-				c.add(Restrictions.le("enterDate", filter.getEnterDateAte()));
-			
-			if(filter.getManufactureDateDe() != null)
-				c.add(Restrictions.ge("manufactureDate", filter.getManufactureDateDe()));
-			
-			if(filter.getManufactureDateAte() != null) 
-				c.add(Restrictions.le("manufactureDate", filter.getManufactureDateAte()));
-			
-			if(filter.getPalletIdDe() > 0)
-				c.add(Restrictions.ge("pallet.id", filter.getPalletIdDe()));
-			
-			if(filter.getPalletIdAte() > 0)
-				c.add(Restrictions.le("pallet.id", filter.getPalletIdAte()));
-			
-			if( filter.isNotPallet() )
-				c.add( Restrictions.isNull("pallet.id") );
-			
-			if(filter.getIdOrderImport() > 0) 
-				c.add(Restrictions.le("order.id", filter.getIdOrderImport()));
-					
-			if(filter.getTypeStock() != null && filter.getTypeStock() != TypeStock.TODOS )
-				c.add(Restrictions.eq("typeStock", filter.getTypeStock()));
-			
-			if ( ( filter.getTerminalId() != null && !filter.getTerminalId().isEmpty() ) || ( filter.getTerminalId_2() != null && !filter.getTerminalId_2().isEmpty() ) )
-			{
-				c.createAlias("stock.terminal", "terminal"); // inner join by default
-				
-				if ( filter.getTerminalId() != null && !filter.getTerminalId().isEmpty() )
+				int page = filter.getPage();
+				int qtyPerPage = LIST_STOCK_QTY_PER_PAGE;
+				if ( page > 0 )
 				{
-					c.add(Restrictions.ge("terminal.idTerminal", filter.getTerminalId()));
+					int firstResult = ( ( page == 1 ) ? 1 : ( ( page - 1 ) * qtyPerPage ) );
+					c.setFirstResult( firstResult );
 				}
-				
-				if ( filter.getTerminalId_2() != null && !filter.getTerminalId_2().isEmpty() )
-				{
-					c.add(Restrictions.le("terminal.idTerminal", filter.getTerminalId_2()));
-				}
+				c.setMaxResults( qtyPerPage );
 			}
+			
+			addConditionsByFilter(filter, c);
 
 			c.addOrder(Order.asc("company.id"));
 			String fieldOrderBy = "";
@@ -251,6 +187,106 @@ public class DefaultStockDao implements StockDao
 		}		
 		
 		return c.list();
+	}
+
+	private void addConditionsByFilter(StockFilter filter, Criteria c) 
+	{
+		if(filter.isOnlyStocked())
+			c.add( Restrictions.eq("status", StockStatus.STOCKED) );
+		
+		if(filter.isOnlyFifo())
+			c.add( Restrictions.eq("inFifo", filter.isOnlyFifo() ) );
+		
+		if(filter.getId() > 0)
+			c.add(Restrictions.ge("id", filter.getId()));
+		
+		if(filter.getId_2() > 0)
+			c.add(Restrictions.le("id", filter.getId_2()));
+
+		if(filter.getProductId() > 0)
+			c.add(Restrictions.eq("product.id", filter.getProductId()));
+		
+		if( filter.getIdMasc() != null && !filter.getIdMasc().isEmpty() )
+		{
+			Product product = GuiGlobals.getDaoFactory().getProductDao().findByIdMasc( filter.getIdMasc() );
+			c.add(Restrictions.ge("product.id", product.getId()));
+		}
+		
+		if( filter.getIdMasc_2() != null && !filter.getIdMasc_2().isEmpty() )
+		{
+			Product product = GuiGlobals.getDaoFactory().getProductDao().findByIdMasc( filter.getIdMasc_2() );
+			c.add(Restrictions.le("product.id", product.getId()));
+		}
+		
+		if ( filter.getCompanyIdDe() != null && !filter.getCompanyIdDe().isEmpty() )
+			c.add(Restrictions.ge("company.id", filter.getCompanyIdDe()));
+		
+		if ( filter.getCompanyIdAte() != null && !filter.getCompanyIdAte().isEmpty() )
+			c.add(Restrictions.le("company.id", filter.getCompanyIdAte()));
+		
+		if( ( filter.getCompanyIdDe() != null && !filter.getCompanyIdDe().isEmpty() ) && ( filter.getTerminalId() != null && !filter.getTerminalId().isEmpty() ) ) {
+			
+			Terminal terminalDe = GuiGlobals.getDaoFactory().getTerminalDao().find(filter.getCompanyIdDe(), filter.getTerminalId());
+			
+			if ( terminalDe != null )
+				c.add(Restrictions.ge("terminal.id", terminalDe.getId()));
+		}
+					
+		if( ( filter.getCompanyIdAte() != null && !filter.getCompanyIdAte().isEmpty() ) && ( filter.getTerminalId_2() != null && !filter.getTerminalId_2().isEmpty() ) ){
+			
+			Terminal terminalAte = GuiGlobals.getDaoFactory().getTerminalDao().find( filter.getCompanyIdAte(), filter.getTerminalId_2());
+			
+			if ( terminalAte != null )
+				c.add(Restrictions.le("terminal.id", terminalAte.getId()));
+		}	
+
+		if(filter.getPartnerId() > 0)
+			c.add(Restrictions.eq("partner.id", filter.getPartnerId()));
+
+		if(filter.getBatch() != null && filter.getBatch().length() > 0)
+			c.add(Restrictions.eq("batch", filter.getBatch()));
+		
+		if(filter.getEnterDateDe() != null)
+			c.add(Restrictions.ge("enterDate", filter.getEnterDateDe()));
+		
+		if(filter.getEnterDateAte() != null) 
+			c.add(Restrictions.le("enterDate", filter.getEnterDateAte()));
+		
+		if(filter.getManufactureDateDe() != null)
+			c.add(Restrictions.ge("manufactureDate", filter.getManufactureDateDe()));
+		
+		if(filter.getManufactureDateAte() != null) 
+			c.add(Restrictions.le("manufactureDate", filter.getManufactureDateAte()));
+		
+		if(filter.getPalletIdDe() > 0)
+			c.add(Restrictions.ge("pallet.id", filter.getPalletIdDe()));
+		
+		if(filter.getPalletIdAte() > 0)
+			c.add(Restrictions.le("pallet.id", filter.getPalletIdAte()));
+		
+		if( filter.isNotPallet() )
+			c.add( Restrictions.isNull("pallet.id") );
+		
+		if(filter.getIdOrderImport() > 0) 
+			c.add(Restrictions.le("order.id", filter.getIdOrderImport()));
+				
+		if(filter.getTypeStock() != null && filter.getTypeStock() != TypeStock.TODOS )
+			c.add(Restrictions.eq("typeStock", filter.getTypeStock()));
+		
+		if ( ( filter.getTerminalId() != null && !filter.getTerminalId().isEmpty() ) || ( filter.getTerminalId_2() != null && !filter.getTerminalId_2().isEmpty() ) )
+		{
+			c.createAlias("stock.terminal", "terminal"); // inner join by default
+			
+			if ( filter.getTerminalId() != null && !filter.getTerminalId().isEmpty() )
+			{
+				c.add(Restrictions.ge("terminal.idTerminal", filter.getTerminalId()));
+			}
+			
+			if ( filter.getTerminalId_2() != null && !filter.getTerminalId_2().isEmpty() )
+			{
+				c.add(Restrictions.le("terminal.idTerminal", filter.getTerminalId_2()));
+			}
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -393,7 +429,8 @@ public class DefaultStockDao implements StockDao
 				if ( pallet.getManufactureDate() == null || pallet.getManufactureDate().compareTo(s.getManufactureDate()) > 0 )
 				{
 					pallet.setManufactureDate(s.getManufactureDate());
-					pallet.setExpirationDate( s.getProduct().getExpirationDate( s.getManufactureDate() ) );
+					if ( s.getManufactureDate() != null )
+						pallet.setExpirationDate( s.getProduct().getExpirationDate( s.getManufactureDate() ) );
 				}
 			}
 			
@@ -635,8 +672,17 @@ public class DefaultStockDao implements StockDao
 		
 		c.add(Restrictions.not( Restrictions.eq("status", PalletStatus.DELETED) ) );
 		
+		
 		if(filter != null)
 		{
+			int page = filter.getPage();
+			int qtyPerPage = LIST_STOCK_QTY_PER_PAGE;
+			if ( page > 0 )
+			{
+				int firstResult = ( ( page == 1 ) ? 1 : ( ( page - 1 ) * qtyPerPage ) );
+				c.setFirstResult( firstResult );
+			}
+			c.setMaxResults( qtyPerPage );
 						
 			if(filter.getPalletIdDe() > 0)
 				c.add(Restrictions.ge("id", (int)filter.getPalletIdDe()));

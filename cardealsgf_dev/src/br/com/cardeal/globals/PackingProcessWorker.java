@@ -222,7 +222,7 @@ public class PackingProcessWorker extends SwingWorker<Integer, String> {
 		map.put("pesoliq", NumberUtils.transform(NumberUtils.truncate(pesoLiquido, 3), 14, 3, false, false) );
 		map.put("pesobruto", NumberUtils.transform(NumberUtils.truncate(pesoBruto, 3), 14, 3, false, false) );
 		
-		sentToPrint(PALLET_VIRUTAL, map);
+		sendToPrint(PALLET_VIRUTAL, map);
 		
 		return 1;
 	}
@@ -1022,7 +1022,7 @@ public class PackingProcessWorker extends SwingWorker<Integer, String> {
 			  
 			  map.put("operacao"	, operation);
 	  
-			  result = sentToPrint(BOX, map);
+			  result = sendToPrint(BOX, map);
 			  
 			  if(!result)
 			  {
@@ -1034,7 +1034,7 @@ public class PackingProcessWorker extends SwingWorker<Integer, String> {
 		  return result;
 	  }
 
-	private boolean sentToPrint(int labelModel, LabelMap map) {
+	private boolean sendToPrint(int labelModel, LabelMap map) {
 		
 		String labelSet = getLabel( labelModel );
 		boolean result = false;
@@ -1050,7 +1050,7 @@ public class PackingProcessWorker extends SwingWorker<Integer, String> {
 				break;
 				
 			case ZEBRA:
-				result = PrintingService.printZebra(map, labelSet );
+				result = PrintingService.printZebra(map, labelSet, false );
 				break;
 
 			case SIMULATOR:
@@ -1356,7 +1356,7 @@ public class PackingProcessWorker extends SwingWorker<Integer, String> {
 			  map.put("qtdedesc", String.valueOf(pallet.getPrimaryQty()) + " UNIDADES");			  			  
 		  }
 		  			  
-		  result = sentToPrint(PALLET, map);
+		  result = sendToPrint(PALLET, map);
 		  
 		  if(!result)
 			  LogDeProcessamento.gravaLog(null, "Não foi possível imprimir o pallet " + String.format("%06d", pallet.getId()) + " - " + printErrorMsg );

@@ -35,6 +35,7 @@ public class StockFilter {
 	private TypeStock typeStock;
 	private String orderBy;
 	private int page = 0;
+	private boolean limitPage = false;
 	
 	public Date getEnterDateDe() {
 		return enterDateDe;
@@ -223,5 +224,11 @@ public class StockFilter {
 	}
 	public void setPage(int page) {
 		this.page = page;
+	}
+	public boolean isLimitPage() {
+		return limitPage;
+	}
+	public void setLimitPage(boolean limitPage) {
+		this.limitPage = limitPage;
 	}
 }

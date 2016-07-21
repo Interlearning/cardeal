@@ -436,68 +436,66 @@ public class PackingPanelPalletVirtual extends JPanel  implements OperationWindo
         		int linha = table.getSelectedRow();
         		int coluna = table.getSelectedColumn();
         		
-        		if(tableModel.isCellEditable(linha, coluna)){
         		
-	        		Object value = tableModel.getValueAt(linha, coluna);	        			        	
-	        		
-	        		switch(coluna)
-	        		{	        		
-		        		case 2:   		        			
-		        			TareDlg pesoCxDlg = new TareDlg(Float.parseFloat(value.toString()),"Peso da Caixa (Kg)");
-		        			pesoCxDlg.setVisible(true);
-		        			
-		        			if(pesoCxDlg.isConfirmed()) {			
-		        				value = Utils.formatWeight(pesoCxDlg.getValue()); // retorna Double
-		        			} 
-		        			else{
-		        				return;
-		        			}
-		        			
-		        			break;
-		        		case 3:        			        			
-		        			QuantityDlg dlg = new QuantityDlg(0,99999,(Integer)value,"Quantidade de Peças");
-		        			dlg.setVisible(true);
-		        			
-		        			if(dlg.isConfirmed()) {
-		        				value = dlg.getValue();
-		        			}
-		        			else{
-		        				return;
-		        			}
-		        			
-		        			break;    
-		        		case 4:		        			
-		        			TareDlg pesoLiqDlg = new TareDlg(Float.parseFloat(value.toString()),"Peso Liquido");
-		        			pesoLiqDlg.setVisible(true);
-		        			
-		        			if(pesoLiqDlg.isConfirmed()) {			
-		        				value = Utils.formatWeight(pesoLiqDlg.getValue()); // retorna Double
-		        			} 
-		        			else{
-		        				return;
-		        			}		   
-		        			
-		        			break;
-		        		case 5:		        			
-		        			TareDlg pesoBrtDlg = new TareDlg(Float.parseFloat(value.toString()),"Peso Bruto");
-		        			pesoBrtDlg.setVisible(true);
-		        			
-		        			if(pesoBrtDlg.isConfirmed()) {			
-		        				value = Utils.formatWeight(pesoBrtDlg.getValue()); // retorna Double
-		        			} 
-		        			else{
-		        				return;
-		        			}		     
-		        			
-		        			break;
-	        		}
-	        		        		
-	        		tableModel.setValueAt((Object)value, linha, coluna);
-	        		tableModel.calcWeightOfRow( tableModel.getDadosGrid().get( table.getSelectedRow() ) );
-	        			        		
-	        		refreshTotals();
-	        		
+        		Object value = tableModel.getValueAt(linha, coluna);	        			        	
+        		
+        		switch(coluna)
+        		{	        		
+	        		case 2:   		        			
+	        			TareDlg pesoCxDlg = new TareDlg(Float.parseFloat(value.toString()),"Peso da Caixa (Kg)");
+	        			pesoCxDlg.setVisible(true);
+	        			
+	        			if(pesoCxDlg.isConfirmed()) {			
+	        				value = Utils.formatWeight(pesoCxDlg.getValue()); // retorna Double
+	        			} 
+	        			else{
+	        				return;
+	        			}
+	        			
+	        			break;
+	        		case 3:        			        			
+	        			QuantityDlg dlg = new QuantityDlg(0,99999,(Integer)value,"Quantidade de Peças");
+	        			dlg.setVisible(true);
+	        			
+	        			if(dlg.isConfirmed()) {
+	        				value = dlg.getValue();
+	        			}
+	        			else{
+	        				return;
+	        			}
+	        			
+	        			break;    
+	        		case 4:		        			
+	        			TareDlg pesoLiqDlg = new TareDlg(Float.parseFloat(value.toString()),"Peso Liquido");
+	        			pesoLiqDlg.setVisible(true);
+	        			
+	        			if(pesoLiqDlg.isConfirmed()) {			
+	        				value = Utils.formatWeight(pesoLiqDlg.getValue()); // retorna Double
+	        			} 
+	        			else{
+	        				return;
+	        			}		   
+	        			
+	        			break;
+	        		case 5:		        			
+	        			TareDlg pesoBrtDlg = new TareDlg(Float.parseFloat(value.toString()),"Peso Bruto");
+	        			pesoBrtDlg.setVisible(true);
+	        			
+	        			if(pesoBrtDlg.isConfirmed()) {			
+	        				value = Utils.formatWeight(pesoBrtDlg.getValue()); // retorna Double
+	        			} 
+	        			else{
+	        				return;
+	        			}		     
+	        			
+	        			break;
         		}
+        		        		
+        		tableModel.setValueAt((Object)value, linha, coluna);
+        		tableModel.calcWeightOfRow( tableModel.getDadosGrid().get( table.getSelectedRow() ) );
+        			        		
+        		refreshTotals();
+	        		
         	}
 		});        
         

@@ -37,7 +37,6 @@ html .jquerycssmenu{height: 1%;} /*Holly Hack for IE7 and below*/
 <script type="text/javascript" src="<c:url value='/resources/js/bootstrap.min.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/resources/js/jquery.datatables.min.js'/>"></script>
 <script type="text/javascript" src="<c:url value='/resources/js/mascaras.js'/>" ></script>
-<script type="text/javascript" src="<c:url value='/resources/js/ResetField.js'/>" ></script>
 
 
 <script type="text/javascript" charset="ISO-8859-1" src="<c:url value='/resources/js/mobileRenderMenu.js'/>" ></script>
@@ -343,13 +342,6 @@ function validaDun14(o){
 						"sLengthMenu": "_MENU_ registros por pagina"
 					}
 				});
-				
-				$.fn.dataTable.moment( 'DD/MM/YYYY HH:mm:ss' );    //Formatação
-		        
-				$('#tabela').dataTable( {    //Criação da dataTable
-		            "order": [[ 4, "desc" ]]   //Campo ordenado por padrão (ao carregar página)
-		        } );
-				
 			});
 		</script>
 

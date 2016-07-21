@@ -38,16 +38,16 @@ public class TableItensPalletVirtualModel extends AbstractTableModel {
 		colunsGrid[1][1] = new String("T");
 		
 		colunsGrid[2][0] = new String("Tara");
-		colunsGrid[2][1] = new String("T");
+		colunsGrid[2][1] = new String("F");
 		
 		colunsGrid[3][0] = new String("Qtde Caixas");
-		colunsGrid[3][1] = new String("T");
+		colunsGrid[3][1] = new String("F");
 		
 		colunsGrid[4][0] = new String("Peso Liq.");
-		colunsGrid[4][1] = new String("T");
+		colunsGrid[4][1] = new String("F");
 		
 		colunsGrid[5][0] = new String("Peso Bruto");
-		colunsGrid[5][1] = new String("T");
+		colunsGrid[5][1] = new String("F");
 		
 		colunsGrid[6][0] = new String("Total Liq.");
 		colunsGrid[6][1] = new String("F");
@@ -113,8 +113,8 @@ public class TableItensPalletVirtualModel extends AbstractTableModel {
     public boolean isCellEditable(int row, int column) 
     {  
     	return colunsGrid[column][1].equals("T");    	
-    }  
-
+    }
+    
     @SuppressWarnings("unchecked")
 	@Override    
 	public Class getColumnClass(int column)
@@ -169,9 +169,10 @@ public class TableItensPalletVirtualModel extends AbstractTableModel {
 	
 	 @Override
 	 // método que a JTable chama quando uma célula é editada;
-	 public void setValueAt(Object value, int rowIndex, int columnIndex) {
+	 public void setValueAt(Object value, int rowIndex, int columnIndex) 
+	 {
 		 
-		 ItensPalletVirtual item = dadosDaGrid.get(rowIndex);
+		ItensPalletVirtual item = dadosDaGrid.get(rowIndex);
          
         switch (columnIndex) {
         

@@ -165,7 +165,7 @@ public class Main {
 		lblTerminal.setBounds(12, 35, 136, 24);
 		panelTop.add(lblTerminal);
 		
-		lblVersao = new JLabel("Versão 1.0 - 07/07/2016");
+		lblVersao = new JLabel("Versão 1.0 - 21/07/2016");
 		lblVersao.setHorizontalAlignment(SwingConstants.CENTER);
 		lblVersao.setFont(new Font("Tahoma", Font.PLAIN, 9));
 		lblVersao.setBounds(160, 0, 665, 10);

@@ -2,15 +2,15 @@ package br.com.cardeal.model;
 
 import br.com.cardeal.globals.NumberUtils;
 
-public class StockTotal {
+public class StockTotalReport {
 	
 	private Product product;
 	
-	private int primaryQty = 0;
+	private long primaryQty = 0;
 
-	private int secondaryQty = 0;
+	private long secondaryQty = 0;
 	
-	private int totEmb = 0;
+	private long totEmb = 0;
 	
 	private double net = 0.0;
 	
@@ -24,19 +24,19 @@ public class StockTotal {
 		this.product = product;
 	}
 
-	public int getPrimaryQty() {
+	public long getPrimaryQty() {
 		return primaryQty;
 	}
 
-	public void setPrimaryQty(int primaryQty) {
+	public void setPrimaryQty(long primaryQty) {
 		this.primaryQty = primaryQty;
 	}
 
-	public int getSecondaryQty() {
+	public long getSecondaryQty() {
 		return secondaryQty;
 	}
 
-	public void setSecondaryQty(int secondaryQty) {
+	public void setSecondaryQty(long secondaryQty) {
 		this.secondaryQty = secondaryQty;
 	}
 
@@ -60,11 +60,11 @@ public class StockTotal {
 		this.tare = tare;
 	}
 
-	public int getTotEmb() {
+	public long getTotEmb() {
 		return totEmb;
 	}
 
-	public void setTotEmb(int totEmb) {
+	public void setTotEmb(long totEmb) {
 		this.totEmb = totEmb;
 	}
 	

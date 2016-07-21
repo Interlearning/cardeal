@@ -46,15 +46,20 @@ public class PrintingService
 	
 	public static boolean printZebra(LabelMap map, String labelFileName) 
 	{
+		return printZebra(map, labelFileName, true); 
+	}
+	
+	public static boolean printZebra(LabelMap map, String labelFileName, boolean isUseFormulario) 
+	{
 		//se a etiqueta a ser impressa é diferente da última, imprime tudo,
 		//caso contrário só imprime as variáveis
-		if(labelFileName.equals(lastLabel))
+		if(labelFileName.equals(lastLabel) && isUseFormulario )
 		{			
 			return printZebraVariables(map);
 		}
 		else
 		{
-			return printZebraFull(map, labelFileName );
+			return printZebraFull(map, labelFileName, isUseFormulario );
 		}
 	}
 	
@@ -68,10 +73,15 @@ public class PrintingService
 			return printIntermecFull(labelMap, labelFileName);
 	}
 	
-	public static boolean printSimulator(LabelMap labelMap, String labelFileName) {
+	public static boolean printSimulator(LabelMap labelMap, String labelFileName) 
+	{
+		return printSimulator(labelMap, labelFileName, true);
+	}
+	
+	public static boolean printSimulator(LabelMap labelMap, String labelFileName, boolean isUseFormulario) {
 		varlines = new ArrayList<String>();
 		lastLabel = "";
-		List<String> listForm = labelMap.translateLabelToList(labelFileName, varlines, PrinterModel.ZEBRA);
+		List<String> listForm = labelMap.translateLabelToList(labelFileName, varlines, PrinterModel.ZEBRA, isUseFormulario);
 		if(listForm != null && listForm.size() > 0) 
 		{
 			logDebugLabel(labelFileName, listForm);
@@ -135,12 +145,16 @@ public class PrintingService
 	
 	}
 
+	public static boolean printZebraFull(LabelMap labelMap, String labelFileName)
+	{
+		return printZebraFull(labelMap, labelFileName, true);
+	}
 	
-	public static boolean printZebraFull(LabelMap labelMap, String labelFileName) 
+	public static boolean printZebraFull(LabelMap labelMap, String labelFileName, boolean isUseFormulario) 
 	{
 		varlines = new ArrayList<String>();
 		lastLabel = "";
-		List<String> list = labelMap.translateLabelToList(labelFileName, varlines, PrinterModel.ZEBRA);
+		List<String> list = labelMap.translateLabelToList(labelFileName, varlines, PrinterModel.ZEBRA, isUseFormulario);
 		if(list != null && list.size() > 0) 
 		{
 //			logDebugLabel(labelFileName, list);
@@ -148,7 +162,7 @@ public class PrintingService
 			if(prnSerial.printZebra(Setup.getPrinterPort(), list)) // Envio do formulario
 			{			
 				lastLabel = labelFileName;
-				return printZebraVariables(labelMap);
+				return ( ( isUseFormulario ) ? printZebraVariables(labelMap) : true );
 			}
 			else 
 			{

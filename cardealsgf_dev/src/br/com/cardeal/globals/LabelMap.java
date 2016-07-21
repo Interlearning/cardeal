@@ -94,9 +94,9 @@ public class LabelMap {
         return list;
 	}
 	
-	public List<String> translateLabelToList(String fileName, List<String> varlines, PrinterModel printerModel) 
+	public List<String> translateLabelToList(String fileName, List<String> varlines, PrinterModel printerModel, boolean isUseFormulario) 
 	{
-		if ( printerModel == PrinterModel.ZEBRA )
+		if ( printerModel == PrinterModel.ZEBRA && isUseFormulario )
 		{
 			return translateLabelToListTypeZebraVariables(fileName, varlines);
 		}

@@ -11,6 +11,7 @@ import br.com.cardeal.model.Product;
 import br.com.cardeal.model.PurchaseOrder;
 import br.com.cardeal.model.Stock;
 import br.com.cardeal.model.StockTotal;
+import br.com.cardeal.model.StockTotalReport;
 import br.com.cardeal.model.Terminal;
 
 public interface StockDao {
@@ -74,5 +75,7 @@ public interface StockDao {
 	boolean exportObjStockTotalToExcel(StockFilter filter, String fileFullName);
 	
 	boolean exportObjStockToExcel(StockFilter filter, String fileFullName);
+
+	List<StockTotalReport> listSumStocked(StockFilter filter, boolean isGroupByProduct);
 		
 }

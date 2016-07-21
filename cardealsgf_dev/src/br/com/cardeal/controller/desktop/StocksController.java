@@ -31,6 +31,7 @@ import br.com.cardeal.model.Stock;
 import br.com.cardeal.model.StockManuten;
 import br.com.cardeal.model.StockOfPalletModel;
 import br.com.cardeal.model.StockTotal;
+import br.com.cardeal.model.StockTotalReport;
 import br.com.cardeal.model.User;
 import br.com.cardeal.services.PalletService;
 import br.com.cardeal.services.StockService;
@@ -118,8 +119,8 @@ public class StocksController {
 			validator.onErrorUse(Results.logic()).redirectTo(StocksController.class).producaoDiaria();
 		}
 		
-		List<StockTotal> total = GuiGlobals.getDaoFactory().getStockDao().totalize(filter);
-		List<StockTotal> totalGeral = GuiGlobals.getDaoFactory().getStockDao().totalizeStock( filter );
+		List<StockTotalReport> total = GuiGlobals.getDaoFactory().getStockDao().listSumStocked(filter, true);
+		List<StockTotalReport> totalGeral = GuiGlobals.getDaoFactory().getStockDao().listSumStocked(filter, false);
 		
         result.include("producao", total);
         result.include("totalGeral", totalGeral);
@@ -241,11 +242,13 @@ public class StocksController {
 			
 			if(showTotal) 
 			{
+				filter.setLimitPage(false);
 				List<StockTotal> totals = GuiGlobals.getDaoFactory().getStockDao().totalize(filter);
 		        result.include("totals", totals);
 			}
 			else 
 			{
+				filter.setLimitPage(true);
 				filter.setAsc(false);
 				filter.setOrderBy("manufactureDate");
 				List<Stock> stocks = GuiGlobals.getDaoFactory().getStockDao().list(filter);
@@ -263,8 +266,9 @@ public class StocksController {
 		{
 			typeStock = TypeStock.TODOS;
 		}
-		List<StockTotal> totalGeral = GuiGlobals.getDaoFactory().getStockDao().totalizeStock( filter );
-        
+
+		List<StockTotalReport> totalGeral = GuiGlobals.getDaoFactory().getStockDao().listSumStocked(filter, false);
+		
 		result.include("user", user);
 		result.include("companyIdDe", filter.getCompanyIdDe());
 		result.include("companyIdAte", filter.getCompanyIdAte());
@@ -786,6 +790,22 @@ public class StocksController {
 		pallets(filter, date3, date4);
 	}
 	
+	public void palletsBack(StockFilter filter, String date3, String date4) 
+	{
+		int page = filter.getPage();
+		page = ( ( page == 1 ) ? 1 : ( page - 1 ) );
+		filter.setPage(page);
+		result.use(Results.logic()).redirectTo(StocksController.class).pallets(filter, date3, date4);
+	}
+	
+	public void palletsForward(StockFilter filter, String date3, String date4) 
+	{
+		int page = filter.getPage();
+		page = ( page + 1 );
+		filter.setPage(page);
+		result.use(Results.logic()).redirectTo(StocksController.class).pallets(filter, date3, date4);
+	}
+	
 	@Path("/stocks/pallets")
 	@Post	
 	public void pallets(StockFilter filter, String date3, String date4) 
@@ -793,9 +813,10 @@ public class StocksController {
 		User user = userInfo.getUser();
 		
 		getFilterAjust(filter, date3, date4, null, null);
-
+		filter.setLimitPage(true);
+		
 		List<Pallet> pallets = GuiGlobals.getDaoFactory().getStockDao().listPallets(filter, false);
-		List<StockTotal> totalGeral = GuiGlobals.getDaoFactory().getStockDao().totalizeStock( filter );
+		List<StockTotalReport> totalGeral = GuiGlobals.getDaoFactory().getStockDao().listSumStocked(filter, false);
 		
         result.include("totalGeral", totalGeral);
         result.include("pallets", pallets);	
@@ -812,6 +833,8 @@ public class StocksController {
         result.include("date4", date4);
         result.include("user", user);
         result.include("filter", filter);
+        result.include("page", ( filter.getPage() == 0 ) ? 1 : filter.getPage() );
+        result.include("qtyPerPage", DefaultStockDao.LIST_STOCK_QTY_PER_PAGE );
         result.include("maxlengthCompanyId", String.valueOf( Company.getLengthFieldId() ) );
         GuiGlobals.closeDb(); // Fecha conexões com o banco
     }
