@@ -20,7 +20,7 @@
 		<property name="hibernate.connection.driver_class">com.microsoft.sqlserver.jdbc.SQLServerDriver</property>
 		<property name="hibernate.connection.url">jdbc:sqlserver://localhost:1433;DatabaseName=cardealsgf_dev;SelectMethod=cursor</property>
 		<property name="hibernate.connection.username">sa</property>
-		<property name="hibernate.connection.password">sqlserver313</property>
+		<property name="hibernate.connection.password">senha</property>
 		
 		<!-- 
 		<property name="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</property>

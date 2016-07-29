@@ -157,19 +157,19 @@
 					<c:if test="${showTotal && not empty totals}">
 						<br>
 						<hr>
-						<input type="hidden" id="companyId" value="${companyId}" />
-						<input type="hidden" id="companyId2" value="${companyId2}" />
-						<input type="hidden" id="terminalId" value="${terminalId}" />
-						<input type="hidden" id="terminalId2" value="${terminalId2}" />
-						<input type="hidden" id="productIdMascDe"  value="${idMasc}" />
-						<input type="hidden" id="productIdMascAte"  value="${idMasc_2}" />
-						<input type="hidden" id="serialNumberDe"  value="${id}" />
-						<input type="hidden" id="serialNumberAte"  value="${id_2}" />
-						<input type="hidden" id="enterDateDe"  value="${date1}" />
-						<input type="hidden" id="enterDateAte" value="${date2}" />
-						<input type="hidden" id="manufactureDateDe"  value="${date3}" />
-						<input type="hidden" id="manufactureDateAte" value="${date4}" />
-						<input type="hidden" id="typeStock" value="${typeStock}" />
+						<input type="hidden" id="companyId" 			value="${filter.companyIdDe}" />
+						<input type="hidden" id="companyId2" 			value="${filter.companyIdAte}" />
+						<input type="hidden" id="terminalId" 			value="${filter.terminalId}" />
+						<input type="hidden" id="terminalId2" 			value="${filter.terminalId_2}" />
+						<input type="hidden" id="productIdMascDe"  		value="${filter.idMasc}" />
+						<input type="hidden" id="productIdMascAte"  	value="${filter.idMasc_2}" />
+						<input type="hidden" id="serialNumberDe"  		value="${filter.id}" />
+						<input type="hidden" id="serialNumberAte"  		value="${filter.id_2}" />
+						<input type="hidden" id="enterDateDe"  			value="${date1}" />
+						<input type="hidden" id="enterDateAte" 			value="${date2}" />
+						<input type="hidden" id="manufactureDateDe" 	value="${date3}" />
+						<input type="hidden" id="manufactureDateAte"	value="${date4}" />
+						<input type="hidden" id="typeStock" 			value="${filter.typeStock}" />
 						<div class="data-block">
 							<div id="listStockTotal"></div>
 							<div id="targetExcel"></div>
@@ -180,19 +180,19 @@
 					<c:if test="${!showTotal && not empty stocks}">
 						<br>
 						<hr>
-						<input type="hidden" id="companyId" value="${companyId}" />
-						<input type="hidden" id="companyId2" value="${companyId2}" />
-						<input type="hidden" id="terminalId" value="${terminalId}" />
-						<input type="hidden" id="terminalId2" value="${terminalId2}" />
-						<input type="hidden" id="productIdMascDe"  value="${idMasc}" />
-						<input type="hidden" id="productIdMascAte"  value="${idMasc_2}" />
-						<input type="hidden" id="serialNumberDe"  value="${id}" />
-						<input type="hidden" id="serialNumberAte"  value="${id_2}" />
-						<input type="hidden" id="enterDateDe"  value="${date1}" />
-						<input type="hidden" id="enterDateAte" value="${date2}" />
-						<input type="hidden" id="manufactureDateDe"  value="${date3}" />
-						<input type="hidden" id="manufactureDateAte" value="${date4}" />
-						<input type="hidden" id="typeStock" value="${typeStock}" />
+						<input type="hidden" id="companyId" 			value="${filter.companyIdDe}" />
+						<input type="hidden" id="companyId2" 			value="${filter.companyIdAte}" />
+						<input type="hidden" id="terminalId" 			value="${filter.terminalId}" />
+						<input type="hidden" id="terminalId2" 			value="${filter.terminalId_2}" />
+						<input type="hidden" id="productIdMascDe"  		value="${filter.idMasc}" />
+						<input type="hidden" id="productIdMascAte"  	value="${filter.idMasc_2}" />
+						<input type="hidden" id="serialNumberDe"  		value="${filter.id}" />
+						<input type="hidden" id="serialNumberAte"  		value="${filter.id_2}" />
+						<input type="hidden" id="enterDateDe"  			value="${date1}" />
+						<input type="hidden" id="enterDateAte" 			value="${date2}" />
+						<input type="hidden" id="manufactureDateDe" 	value="${date3}" />
+						<input type="hidden" id="manufactureDateAte"	value="${date4}" />
+						<input type="hidden" id="typeStock" 			value="${filter.typeStock}" />
 						<div class="data-block">
 							<div id="listStock"></div>
 							<div id="targetExcel"></div>
@@ -224,10 +224,10 @@
 												<tr class="odd gradeX">
 													<td>${total.product.idMasc}</td>
 													<td>${total.product.description}</td>
-													<td>${total.totEmb}</td>
-													<td>${total.secondaryQty}</td>												
-													<td>${total.primaryQty}</td>
-													<td>${total.netFormatted}</td>
+													<td align=right>${total.totEmb}</td>
+													<td align=right>${total.secondaryQty}</td>												
+													<td align=right>${total.primaryQty}</td>
+													<td align=right>${total.netFormatted}</td>
 												</tr>
 												</c:forEach>
 											</tbody>
@@ -261,10 +261,10 @@
 													<tr class="odd gradeX">
 														<td>${total.product.idMasc}</td>
 														<td>${total.product.description}</td>
-														<td>${total.totEmb}</td>
-														<td>${total.secondaryQty}</td>														
-														<td>${total.primaryQty}</td>
-														<td>${total.netFormatted}</td>
+														<td align=right>${total.totEmb}</td>
+														<td align=right>${total.secondaryQty}</td>														
+														<td align=right>${total.primaryQty}</td>
+														<td align=right>${total.netFormatted}</td>
 													</tr>
 													</c:forEach>
 												</tbody>
@@ -307,11 +307,12 @@
 												<td>${stock.company.id}</td>
 												<td>${stock.product.idMasc}</td>
 												<td>${stock.product.descriptionTruncated}</td>
-												<td data-order="${stock.manufactureDate.time}"><fmt:formatDate value="${stock.manufactureDate}" pattern="dd/MM/yyyy" type="DATE"/></td>
-												<td>1</td>
-												<td>${stock.secondaryQty}</td>												
-												<td>${stock.primaryQty}</td>
-												<td>${stock.netFormatted}</td>
+												<!-- WJSP 14/07/2016 -->												
+												<td align=right data-order="${stock.manufactureDate.time}"><fmt:formatDate value="${stock.manufactureDate}" pattern="dd/MM/yyyy" type="DATE"/></td>												
+												<td align=right>1</td>
+												<td align=right>${stock.secondaryQty}</td>												
+												<td align=right>${stock.primaryQty}</td>
+												<td align=right>${stock.netFormatted}</td>
 												<td>${stock.pallet.idFormatted}</td>
 												<td>${stock.operation}</td>																																				
 											</tr>
@@ -327,10 +328,14 @@
 													
 													<input type="hidden" class="form-control" name="filter.companyIdDe" id="filter.companyIdDe" value="${companyIdDe}" />
 													<input type="hidden" class="form-control" name="filter.companyIdAte" id="filter.companyIdAte" value="${companyIdAte}" />
-													<input type="hidden" class="form-control" name="filter.id" id="filter.id" value="${id}" />
-													<input type="hidden" class="form-control" name="filter.id_2" id="filter.id_2" value="${id_2}" />
+													<input type="hidden" class="form-control" name="filter.terminalId" id="filter.terminalId" value="${terminalId}" />
+													<input type="hidden" class="form-control" name="filter.terminalId_2" id="filter.terminalId_2" value="${terminalId2}" />
 													<input type="hidden" class="form-control" name="filter.idMasc" id="filter.idMasc" value="${idMasc}" />
 													<input type="hidden" class="form-control" name="filter.idMasc_2" id="filter.idMasc_2" value="${idMasc_2}" />
+													
+													<input type="hidden" class="form-control" name="filter.id" id="filter.id" value="${id}" />
+													<input type="hidden" class="form-control" name="filter.id_2" id="filter.id_2" value="${id_2}" />
+
 											        <input type="hidden" class="form-control" id="date1" name="date1" value="${date1}" />
 													<input type="hidden" class="form-control" id="date2" name="date2" value="${date2}" />
 													<input type="hidden" class="form-control" id="date3" name="date3" value="${date3}" />
@@ -389,10 +394,10 @@
 											<tbody>
 												<c:forEach items="${totalGeral}" var="totalGer">
 												<tr class="odd gradeX">											
-													<td>${totalGer.totEmb}</td>
-													<td>${totalGer.secondaryQty}</td>												
-													<td>${totalGer.primaryQty}</td>
-													<td>${totalGer.netFormatted}</td>
+													<td align=right>${totalGer.totEmb}</td>
+													<td align=right>${totalGer.secondaryQty}</td>												
+													<td align=right>${totalGer.primaryQty}</td>
+													<td align=right>${totalGer.netFormatted}</td>
 												</tr>
 												</c:forEach>
 											</tbody>

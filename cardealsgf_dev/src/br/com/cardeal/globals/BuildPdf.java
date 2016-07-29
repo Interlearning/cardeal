@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
+
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -17,6 +19,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import br.com.cardeal.log.LogDeProcessamento;
+import br.com.cardeal.model.DadosPdf;
 
 
 public class BuildPdf {
@@ -187,6 +190,36 @@ public class BuildPdf {
 		
 	}
 	
+	// WJSP 21/07/2016
+	public void printTableAlignmentCell( String title, float[] sizeColumns, ArrayList<String> campos, List<ArrayList<DadosPdf>> dadosPdf )
+	{
+		addTitle(title, subFont, false, true, 2);
+		
+		if ( sizeColumns != null && sizeColumns.length > 0 )
+		{
+			table = new PdfPTable( sizeColumns );
+		}
+		else
+		{
+			table = new PdfPTable( campos.size() );
+		}
+	    table.setTotalWidth(570);
+	    table.setLockedWidth(true);
+	    
+	    addHeaderTable( campos );
+	    addRowsTableAlignmentCell( dadosPdf );    
+
+	    try {	    	
+	    	document.add(table);
+		} catch (DocumentException e) {
+			STATE = ERROR_EDIT_PDF;
+			classDestroy();
+			e.printStackTrace();
+			LogDeProcessamento.gravaLog( "console", e.getClass().getName() + "\n" + e.getMessage(), true);
+		}
+		
+	}
+	
 	public void print(){
 		document.close();
 	}
@@ -216,6 +249,24 @@ public class BuildPdf {
 			}
 	    }
 	}
+	
+	/* WJSP 25/07/2016
+	 	- Insere os dados na célula da tabela que será apresentada em PDF
+	 	- Alinha o texto dentro da célula 
+	 */
+	private void addRowsTableAlignmentCell( List<ArrayList<DadosPdf>> dadosPdf )
+	{		
+		for (int i = 0; i < dadosPdf.size(); i++) 
+		{
+			for (int n = 0; n < dadosPdf.get(i).size() ;n++) 
+			{							
+				PdfPCell celula = new PdfPCell(new Phrase(dadosPdf.get(i).get(n).getConteudo(), fontSimple));
+				celula.setHorizontalAlignment(dadosPdf.get(i).get(n).getAlinhamento());				
+				table.addCell(celula);			
+			}
+		}
+	}
+	
 	
 //  public static void main(String[] args) {
 //    try {

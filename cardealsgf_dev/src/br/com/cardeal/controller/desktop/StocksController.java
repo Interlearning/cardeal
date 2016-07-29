@@ -8,6 +8,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.itextpdf.text.pdf.PdfPCell;
+
 import br.com.cardeal.dao.DefaultStockDao;
 import br.com.cardeal.enums.ComponentPermission;
 import br.com.cardeal.enums.Operation;
@@ -24,6 +27,7 @@ import br.com.cardeal.globals.Utils;
 import br.com.cardeal.interceptor.Public;
 import br.com.cardeal.interceptor.UserInfo;
 import br.com.cardeal.model.Company;
+import br.com.cardeal.model.DadosPdf;
 import br.com.cardeal.model.Terminal;
 import br.com.cardeal.model.Pallet;
 import br.com.cardeal.model.Product;
@@ -248,10 +252,12 @@ public class StocksController {
 			}
 			else 
 			{
-				filter.setLimitPage(true);
+				//filter.setLimitPage(true);
+				filter.setLimitPage(false);
 				filter.setAsc(false);
 				filter.setOrderBy("manufactureDate");
-				List<Stock> stocks = GuiGlobals.getDaoFactory().getStockDao().list(filter);
+				//List<Stock> stocks = GuiGlobals.getDaoFactory().getStockDao().list(filter);
+				List<Stock> stocks = GuiGlobals.getDaoFactory().getStockDao().listWeb(filter);
 		        result.include("stocks", stocks);			
 			}
 		}
@@ -269,13 +275,18 @@ public class StocksController {
 
 		List<StockTotalReport> totalGeral = GuiGlobals.getDaoFactory().getStockDao().listSumStocked(filter, false);
 		
+		
+		/* Set nas variaveis ${nome_da_var} do list.jsp
+		 * result.include("companyIdDe", filter.getCompanyIdDe());
+		 * value="${companyIdDe}"
+		 */
 		result.include("user", user);
-		result.include("companyIdDe", filter.getCompanyIdDe());
+		/*result.include("companyIdDe", filter.getCompanyIdDe());
 		result.include("companyIdAte", filter.getCompanyIdAte());
 		result.include("id", filter.getId());
 		result.include("id_2", filter.getId_2());
 		result.include("idMasc", filter.getIdMasc());
-        result.include("idMasc_2", filter.getIdMasc_2());
+        result.include("idMasc_2", filter.getIdMasc_2()); */
         result.include("date1", date1);
         result.include("date2", date2);
         result.include("date3", date3);
@@ -523,11 +534,22 @@ public class StocksController {
 	{
 		getFilterAjust(filter, date1, date2, date3, date4);
 		
+		filter.setAsc(false);
+		filter.setOrderBy("id");
 		List<StockTotal> total = GuiGlobals.getDaoFactory().getStockDao().totalize(filter);
 		if ( total != null ) {
 		
 			String nameFile = getFileNameToExport(TypeExportReport.PDF, "listagemEstoqueTotalPDF");
 			String fileFullName = getExportName( nameFile );
+			
+			// Definição relativa das colunas no pdf. 0.05f = 5%
+			float[] fieldSizes = new float[] {	0.03f,	// "FILIAL"
+												0.05f,  // "COD"
+												0.3f,	// "DESCRIÇÃO"
+												0.05f,	// "EMB"
+												0.05f,	// "CAIXAS"	
+												0.05f,	// "PEÇAS"
+												0.1f,};	// "PESO LÍQUIDO (KG)"
 			
 			// Criando arquivo pdf a ser editado
 			BuildPdf pdfExport = new BuildPdf( fileFullName );
@@ -541,83 +563,99 @@ public class StocksController {
 				
 				// Editando cabeçalho da tabela a ser impressa
 				ArrayList<String> campos = new ArrayList<String>();
-				campos.add("Produto");
-				campos.add("Descrição");
-				campos.add("Caixas");
-				campos.add("Peças");
-				campos.add("Peso Líquido (kg)");
+				campos.add("FIL");
+				campos.add("COD");
+				campos.add("DESCRIÇÃO");
+				campos.add("EMB");
+				campos.add("CAIXAS");
+				campos.add("PEÇAS");
+				campos.add("P.LÍQ.(kg)");
 				
-				//Editando dados do itens
-				String[][] dados = new String[total.size()+1][campos.size()];
-				int contador = 0;
+				List<ArrayList<DadosPdf>> dadosPdf = new ArrayList<>();
+				
 				int qtyEmb = 0;
+				int qtyBox  = 0;
 				int qtyPec = 0;
 				double qtyNet = 0;
 				for ( StockTotal stockTotal : total )
 				{
-					dados[contador][0] = stockTotal.getProduct().getIdMasc();
-					dados[contador][1] = stockTotal.getProduct().getDescription();
-					dados[contador][2] = String.valueOf(stockTotal.getSecondaryQty());
-					dados[contador][3] = String.valueOf(stockTotal.getPrimaryQty());
-					dados[contador][4] = stockTotal.getNetFormatted();
+					ArrayList<DadosPdf> linha = new ArrayList<DadosPdf>();
 					
-					qtyEmb += stockTotal.getSecondaryQty();
+					linha.add(new DadosPdf(stockTotal.getCompany().getId(),PdfPCell.ALIGN_LEFT) );
+					linha.add(new DadosPdf(stockTotal.getProduct().getIdMasc(), PdfPCell.ALIGN_LEFT));
+					linha.add(new DadosPdf(stockTotal.getProduct().getDescription(), PdfPCell.ALIGN_LEFT));
+					linha.add(new DadosPdf("1", PdfPCell.ALIGN_RIGHT));
+					linha.add(new DadosPdf(String.valueOf(stockTotal.getSecondaryQty()), PdfPCell.ALIGN_RIGHT));
+					linha.add(new DadosPdf(String.valueOf(stockTotal.getPrimaryQty()), PdfPCell.ALIGN_RIGHT));
+					linha.add(new DadosPdf(stockTotal.getNetFormatted(), PdfPCell.ALIGN_RIGHT));
+					
+					qtyEmb++; 
+					qtyBox += stockTotal.getSecondaryQty();
 					qtyPec += stockTotal.getPrimaryQty();
 					qtyNet += stockTotal.getNet();
 					
-					contador++;
+					dadosPdf.add(linha);
 				}
 				
-				dados[dados.length-1][0] = "Total:";
-				dados[dados.length-1][2] = String.valueOf(qtyEmb);
-				dados[dados.length-1][3] = String.valueOf(qtyPec);
-				dados[dados.length-1][4] = NumberUtils.transform(NumberUtils.truncate(qtyNet, 3), 14, 3, false, false);
+				/* Ajuste para a última linha do relatório
+				 * Imprime apenas os totais por coluna
+				 */
+				ArrayList<DadosPdf> linha = new ArrayList<DadosPdf>();
+				
+				linha.add(new DadosPdf("Total", PdfPCell.ALIGN_LEFT));
+				linha.add(new DadosPdf("", PdfPCell.ALIGN_RIGHT));
+				linha.add(new DadosPdf("", PdfPCell.ALIGN_RIGHT));
+				linha.add(new DadosPdf(String.valueOf(qtyEmb), PdfPCell.ALIGN_RIGHT));
+				linha.add(new DadosPdf(String.valueOf(qtyBox), PdfPCell.ALIGN_RIGHT));
+				linha.add(new DadosPdf(String.valueOf(qtyPec), PdfPCell.ALIGN_RIGHT));
+				linha.add(new DadosPdf(NumberUtils.transform(NumberUtils.truncate(qtyNet, 3), 14, 3, false, false), PdfPCell.ALIGN_RIGHT));
+				
+				dadosPdf.add(linha);
 						
 				if (pdfExport.getState() == 0) { // Se nao ocorreu erro na montagem do Relatório
 				
-					// Enviando cabeçalho e dados para impressï¿½o do Relatório		
-					pdfExport.printTable("Relatório de Estoque Atual Totalizado", campos, dados);
-					
+					// Enviando cabeçalho e dados para impressão do Relatório
+					pdfExport.printTableAlignmentCell("Relatório de Estoque Atual Totalizado", fieldSizes,campos, dadosPdf);
 					if (pdfExport.getState() == 0) { // Se nao ocorreu erro na montagem do Relatório
-					
+						
 						pdfExport.print();
-						showPdfOnBrowser( fileFullName );
-												
+						//showPdfOnBrowser( fileFullName );
+						downloadOnBrowser( fileFullName, "application/pdf");
 					}
-					
 				}
-				
 			}
-			
 		}
 		else{
 			result.include("notice", "Arquivo PDF não pode ser gerado!");
 		}
-		result.use(Results.logic()).redirectTo(StocksController.class).producaoDiaria();
+		//result.use(Results.logic()).redirectTo(StocksController.class).producaoDiaria();
 		
 		GuiGlobals.closeDb(); // Fecha conexões com o banco
 	}
 	
 	public void exportStockProductionToPDF( StockFilter filter, String date1, String date2, String date3, String date4 )
-	{
+	{		
 		getFilterAjust(filter, date1, date2, date3, date4);
 		
+		filter.setAsc(true);
+		filter.setOrderBy("id");
 		List<Stock> stocks = GuiGlobals.getDaoFactory().getStockDao().list(filter);
 		if ( stocks != null && stocks.size() > 0) 
-		{
-		
+		{		
 			String nameFile = getFileNameToExport(TypeExportReport.PDF, "listagemEstoquePDF");
 			String fileFullName = getExportName( nameFile );
 			// Definição relativa das colunas no pdf. 0.05f = 5%
 			float[] fieldSizes = new float[] {	0.06f,	// "FILIAL"
 												0.08f,	// "NR. SÉRIE"
-												0.4f,	// "PRODUTO"
-												0.07f,	// "EMB"
-												0.07f,	// "CX"	
-												0.07f,	// "PC"
+												0.05f,  // "COD"
+												0.3f,	// "DESCRIÇÃO"
+												0.05f,	// "EMB"
+												0.05f,	// "CX"	
+												0.05f,	// "PC"
 												0.1f,	// "P.LÍQ.(kg)"
 												0.08f,	// "TIPO ESTOQUE"
-												0.07f};	// "PALETE"
+												0.07f,	// "PALETE"
+												0.05f,};// "FLAG"
 			
 			// Criando arquivo pdf a ser editado
 			BuildPdf pdfExport = new BuildPdf( fileFullName );
@@ -633,68 +671,112 @@ public class StocksController {
 				ArrayList<String> campos = new ArrayList<String>();
 				campos.add("FILIAL");
 				campos.add("NR. SÉRIE");
-				campos.add("PRODUTO");
+				campos.add("COD");
+				campos.add("DESCRIÇÃO");
 				campos.add("EMB");
 				campos.add("CX");
 				campos.add("PC");	        
 				campos.add("P.LÍQ.(kg)");
 				campos.add("TIPO ESTOQUE");
 				campos.add("PALETE");
-				
-				//Editando dados do itens
-				String[][] dados = new String[stocks.size()+1][campos.size()];
-				int contador = 0;
+				campos.add("FLAG");
+								
+				List<ArrayList<DadosPdf>> dadosPdf = new ArrayList<>();
+												
 				int qtyEmb = 0;
 				int qtyBox = 0;
 				int qtyPec = 0;
 				double qtyNet = 0;
 				for ( Stock stock : stocks )
 				{
-					dados[contador][0] = stock.getCompany().getId();
-					dados[contador][1] = stock.getIdFormatSerial();
-					dados[contador][2] = stock.getProduct().toString();
-					dados[contador][3] = "1";
-					dados[contador][4] = String.valueOf( stock.getSecondaryQty() );
-					dados[contador][5] = String.valueOf( stock.getPrimaryQty() );
-					dados[contador][6] = stock.getNetFormatted();
-					dados[contador][7] = stock.getTypeStock().getDescricao();
-					dados[contador][8] = (stock.getPallet() != null) ? stock.getPallet().getIdFormatted() : Utils.formatPallet(0);
+					ArrayList<DadosPdf> linha = new ArrayList<DadosPdf>();
+					
+					linha.add(new DadosPdf(stock.getCompany().getId(),PdfPCell.ALIGN_LEFT) );
+					linha.add(new DadosPdf(stock.getIdFormatSerial(), PdfPCell.ALIGN_LEFT));
+					linha.add(new DadosPdf(stock.getProduct().getIdMasc(), PdfPCell.ALIGN_LEFT));
+					linha.add(new DadosPdf(stock.getProduct().getDescription(), PdfPCell.ALIGN_LEFT));
+					linha.add(new DadosPdf("1", PdfPCell.ALIGN_RIGHT));
+					linha.add(new DadosPdf(String.valueOf( stock.getSecondaryQty() ), PdfPCell.ALIGN_RIGHT));
+					linha.add(new DadosPdf(String.valueOf( stock.getPrimaryQty()), PdfPCell.ALIGN_RIGHT));
+					linha.add(new DadosPdf(stock.getNetFormatted(), PdfPCell.ALIGN_RIGHT));
+					linha.add(new DadosPdf(stock.getTypeStock().getDescricao(), PdfPCell.ALIGN_LEFT));
+					
+					String formatPallet = (stock.getPallet() != null) ? stock.getPallet().getIdFormatted() : Utils.formatPallet(0);
+					linha.add(new DadosPdf(formatPallet, PdfPCell.ALIGN_LEFT));
+					linha.add(new DadosPdf(stock.getOperation(), PdfPCell.ALIGN_CENTER));
 					
 					qtyEmb += 1;
 					qtyBox += stock.getSecondaryQty();
 					qtyPec += stock.getPrimaryQty();
 					qtyNet += stock.getNet();
 					
-					contador++;
+					dadosPdf.add(linha);
 				}
 				
-				dados[dados.length-1][0] = "Total:";
-				dados[dados.length-1][3] = String.valueOf(qtyEmb);
-				dados[dados.length-1][4] = String.valueOf(qtyBox);
-				dados[dados.length-1][5] = String.valueOf(qtyPec);
-				dados[dados.length-1][6] = NumberUtils.transform(NumberUtils.truncate(qtyNet, 3), 14, 3, false, false);
+				/* Ajuste para a última linha do relatório
+				 * Imprime apenas os totais por coluna
+				 */
+				ArrayList<DadosPdf> linha = new ArrayList<DadosPdf>();
+				linha.add(new DadosPdf("Total",PdfPCell.ALIGN_LEFT));
+				linha.add(new DadosPdf("",PdfPCell.ALIGN_LEFT));
+				linha.add(new DadosPdf("",PdfPCell.ALIGN_LEFT));
+				linha.add(new DadosPdf("",PdfPCell.ALIGN_LEFT));
+				linha.add(new DadosPdf(String.valueOf(qtyEmb),PdfPCell.ALIGN_RIGHT));
+				linha.add(new DadosPdf(String.valueOf(qtyBox),PdfPCell.ALIGN_RIGHT));
+				linha.add(new DadosPdf(String.valueOf(qtyPec),PdfPCell.ALIGN_RIGHT));
+				linha.add(new DadosPdf(NumberUtils.transform(NumberUtils.truncate(qtyNet, 3), 14, 3, false, false),PdfPCell.ALIGN_RIGHT));
+				linha.add(new DadosPdf("",PdfPCell.ALIGN_LEFT));
+				linha.add(new DadosPdf("",PdfPCell.ALIGN_LEFT));
+				linha.add(new DadosPdf("",PdfPCell.ALIGN_LEFT));
+				
+				dadosPdf.add(linha);
 						
 				if (pdfExport.getState() == 0) 
 				{
-					pdfExport.printTable("Relatório de Estoque Atual", fieldSizes,campos, dados);
+					pdfExport.printTableAlignmentCell("Relatório de Estoque Atual", fieldSizes,campos, dadosPdf);
 					
 					if (pdfExport.getState() == 0) 
 					{
 						pdfExport.print();
-						showPdfOnBrowser( fileFullName );
+						//showPdfOnBrowser( fileFullName );
+						downloadOnBrowser( fileFullName, "application/pdf");
 					}
-					
 				}
-				
 			}
-			
 		}
 		else{
 			result.include("notice", "Arquivo PDF não pode ser gerado!");
 		}
-		result.use(Results.logic()).redirectTo(StocksController.class).producaoDiaria();
+		//result.use(Results.logic()).redirectTo(StocksController.class).producaoDiaria();
 		
 		GuiGlobals.closeDb(); // Fecha conexões com o banco
+	}
+	
+	// Gera o PDF e faz o download do arquivo gerado
+	public void downloadOnBrowser( String fileFullName, String contentType )
+	{
+		byte[] arquivo = null;
+		File file = new File( fileFullName );
+		
+		try {
+			arquivo = GuiGlobals.fileToByte( file );
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		servletResponse.setHeader("Content-disposition", "attachment;filename="+fileFullName);
+		servletResponse.setContentType(contentType);
+		servletResponse.setContentLength(arquivo.length);
+		
+		ServletOutputStream ouputStream;
+		try {
+			ouputStream = servletResponse.getOutputStream();
+			ouputStream.write(arquivo, 0, arquivo.length);
+			ouputStream.flush();
+			ouputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void showPdfOnBrowser( String fileFullName )
@@ -707,7 +789,7 @@ public class StocksController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+				
 		servletResponse.setContentType("application/pdf");
 		servletResponse.setContentLength(arquivo.length);
 		

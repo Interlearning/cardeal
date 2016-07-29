@@ -123,9 +123,9 @@
 											<tr class="odd gradeX">
 												<td>${producaoDiaria.product.idMasc}</td>
 												<td>${producaoDiaria.product.description}</td>
-												<td>${producaoDiaria.secondaryQty}</td>
-												<td>${producaoDiaria.primaryQty}</td>
-												<td>${producaoDiaria.netFormatted}</td>																			
+												<td align=right>${producaoDiaria.secondaryQty}</td>
+												<td align=right>${producaoDiaria.primaryQty}</td>
+												<td align=right>${producaoDiaria.netFormatted}</td>
 											</tr>
 										</c:forEach>
 									</tbody>
@@ -159,9 +159,9 @@
 													<tr class="odd gradeX">
 														<td>${producaoDiaria.product.idMasc}</td>
 														<td>${producaoDiaria.product.description}</td>
-														<td>${producaoDiaria.secondaryQty}</td>
-														<td>${producaoDiaria.primaryQty}</td>
-														<td>${producaoDiaria.netFormatted}</td>										
+														<td align=right>${producaoDiaria.secondaryQty}</td>
+														<td align=right>${producaoDiaria.primaryQty}</td>
+														<td align=right>${producaoDiaria.netFormatted}</td>										
 													</tr>
 												</c:forEach>
 											</tbody>
@@ -192,10 +192,10 @@
 											<tbody>
 												<c:forEach items="${totalGeral}" var="totalGer">
 												<tr class="odd gradeX">											
-													<td>${totalGer.totEmb}</td>
-													<td>${totalGer.secondaryQty}</td>												
-													<td>${totalGer.primaryQty}</td>
-													<td>${totalGer.netFormatted}</td>
+													<td align=right>${totalGer.totEmb}</td>
+													<td align=right>${totalGer.secondaryQty}</td>												
+													<td align=right>${totalGer.primaryQty}</td>
+													<td align=right>${totalGer.netFormatted}</td>
 												</tr>
 												</c:forEach>
 											</tbody>

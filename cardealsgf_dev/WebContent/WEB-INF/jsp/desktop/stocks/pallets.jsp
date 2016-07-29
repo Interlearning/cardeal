@@ -163,14 +163,15 @@
 										<td>${pallet.idFormatted}</td>
 										<td>${pallet.product.idMasc}</td>
 										<td>${pallet.product.descriptionTruncated}</td>
-										<td>${pallet.embQty}</td>
-										<td>${pallet.secondaryQty}</td>
-										<td>${pallet.primaryQty}</td>
-										<td>${pallet.netFormatted}</td>
+										<td align=right>${pallet.embQty}</td>
+										<td align=right>${pallet.secondaryQty}</td>
+										<td align=right>${pallet.primaryQty}</td>
+										<td align=right>${pallet.netFormatted}</td>
 										<td>${pallet.company.id}</td>
 										<td>${pallet.terminal.idTerminal}</td>
-										<td>${pallet.openDateDesc}</td>
-										<td>${pallet.closeDateDesc}</td>
+										<!-- WJSP 14/07/2016 -->
+										<td align=right data-order="${pallet.openDate.time}">${pallet.openDateDesc}</td>
+										<td align=right data-order="${pallet.closeDate.time}">${pallet.closeDateDesc}</td>
 										<td>${pallet.statusDesc}</td>
 										<td class="toolbar toolbar-btn-link" style="text-align:center;">
 											<div class="btn-group">													
@@ -248,10 +249,10 @@
 											<tbody>
 												<c:forEach items="${totalGeral}" var="totalGer">
 												<tr class="odd gradeX">											
-													<td>${totalGer.totEmb}</td>
-													<td>${totalGer.secondaryQty}</td>												
-													<td>${totalGer.primaryQty}</td>
-													<td>${totalGer.netFormatted}</td>
+													<td align=right>${totalGer.totEmb}</td>
+													<td align=right>${totalGer.secondaryQty}</td>												
+													<td align=right>${totalGer.primaryQty}</td>
+													<td align=right>${totalGer.netFormatted}</td>
 												</tr>
 												</c:forEach>
 											</tbody>

@@ -187,8 +187,8 @@ public class DefaultStockDao implements StockDao
 		}		
 		
 		return c.list();
-	}
-
+	}	
+	
 	private void addConditionsByFilter(StockFilter filter, Criteria c) 
 	{
 		if(filter.isOnlyStocked())
@@ -216,6 +216,156 @@ public class DefaultStockDao implements StockDao
 		{
 			Product product = GuiGlobals.getDaoFactory().getProductDao().findByIdMasc( filter.getIdMasc_2() );
 			c.add(Restrictions.le("product.id", product.getId()));
+		}
+		
+		if ( filter.getCompanyIdDe() != null && !filter.getCompanyIdDe().isEmpty() )
+			c.add(Restrictions.ge("company.id", filter.getCompanyIdDe()));
+		
+		if ( filter.getCompanyIdAte() != null && !filter.getCompanyIdAte().isEmpty() )
+			c.add(Restrictions.le("company.id", filter.getCompanyIdAte()));
+		
+		if( ( filter.getCompanyIdDe() != null && !filter.getCompanyIdDe().isEmpty() ) && ( filter.getTerminalId() != null && !filter.getTerminalId().isEmpty() ) ) {
+			
+			Terminal terminalDe = GuiGlobals.getDaoFactory().getTerminalDao().find(filter.getCompanyIdDe(), filter.getTerminalId());
+			
+			if ( terminalDe != null )
+				c.add(Restrictions.ge("terminal.id", terminalDe.getId()));
+		}
+					
+		if( ( filter.getCompanyIdAte() != null && !filter.getCompanyIdAte().isEmpty() ) && ( filter.getTerminalId_2() != null && !filter.getTerminalId_2().isEmpty() ) ){
+			
+			Terminal terminalAte = GuiGlobals.getDaoFactory().getTerminalDao().find( filter.getCompanyIdAte(), filter.getTerminalId_2());
+			
+			if ( terminalAte != null )
+				c.add(Restrictions.le("terminal.id", terminalAte.getId()));
+		}	
+
+		if(filter.getPartnerId() > 0)
+			c.add(Restrictions.eq("partner.id", filter.getPartnerId()));
+
+		if(filter.getBatch() != null && filter.getBatch().length() > 0)
+			c.add(Restrictions.eq("batch", filter.getBatch()));
+		
+		if(filter.getEnterDateDe() != null)
+			c.add(Restrictions.ge("enterDate", filter.getEnterDateDe()));
+		
+		if(filter.getEnterDateAte() != null) 
+			c.add(Restrictions.le("enterDate", filter.getEnterDateAte()));
+		
+		if(filter.getManufactureDateDe() != null)
+			c.add(Restrictions.ge("manufactureDate", filter.getManufactureDateDe()));
+		
+		if(filter.getManufactureDateAte() != null) 
+			c.add(Restrictions.le("manufactureDate", filter.getManufactureDateAte()));
+		
+		if(filter.getPalletIdDe() > 0)
+			c.add(Restrictions.ge("pallet.id", filter.getPalletIdDe()));
+		
+		if(filter.getPalletIdAte() > 0)
+			c.add(Restrictions.le("pallet.id", filter.getPalletIdAte()));
+		
+		if( filter.isNotPallet() )
+			c.add( Restrictions.isNull("pallet.id") );
+		
+		if(filter.getIdOrderImport() > 0) 
+			c.add(Restrictions.le("order.id", filter.getIdOrderImport()));
+				
+		if(filter.getTypeStock() != null && filter.getTypeStock() != TypeStock.TODOS )
+			c.add(Restrictions.eq("typeStock", filter.getTypeStock()));
+		
+		if ( ( filter.getTerminalId() != null && !filter.getTerminalId().isEmpty() ) || ( filter.getTerminalId_2() != null && !filter.getTerminalId_2().isEmpty() ) )
+		{
+			c.createAlias("stock.terminal", "terminal"); // inner join by default
+			
+			if ( filter.getTerminalId() != null && !filter.getTerminalId().isEmpty() )
+			{
+				c.add(Restrictions.ge("terminal.idTerminal", filter.getTerminalId()));
+			}
+			
+			if ( filter.getTerminalId_2() != null && !filter.getTerminalId_2().isEmpty() )
+			{
+				c.add(Restrictions.le("terminal.idTerminal", filter.getTerminalId_2()));
+			}
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Stock> listWeb(StockFilter filter) 
+	{
+		Criteria c = session.createCriteria(Stock.class, "stock");
+		
+		if(filter != null) 
+		{
+			if ( filter.isLimitPage() )
+			{
+				int page = filter.getPage();
+				int qtyPerPage = LIST_STOCK_QTY_PER_PAGE;
+				if ( page > 0 )
+				{
+					int firstResult = ( ( page == 1 ) ? 1 : ( ( page - 1 ) * qtyPerPage ) );
+					c.setFirstResult( firstResult );
+				}
+				c.setMaxResults( qtyPerPage );
+			}
+			
+			addConditionsByFilterWeb(filter, c);
+
+			c.addOrder(Order.asc("company.id"));
+			String fieldOrderBy = "";
+			
+			if ( filter.getOrderBy() != null && !filter.getOrderBy().isEmpty() )
+			{
+				fieldOrderBy = filter.getOrderBy();
+			}
+			
+			if( filter.isAsc() )
+			{
+				if ( !fieldOrderBy.isEmpty() ) c.addOrder(Order.asc(fieldOrderBy));
+			}
+			else
+			{
+				if ( !fieldOrderBy.isEmpty() ) c.addOrder(Order.desc(fieldOrderBy));
+			}
+			
+			if ( !fieldOrderBy.isEmpty() && !fieldOrderBy.trim().toLowerCase().equals("id") ) c.addOrder(Order.asc("id"));
+			
+		}		
+		
+		return c.list();
+	}	
+	
+	private void addConditionsByFilterWeb(StockFilter filter, Criteria c) 
+	{
+		if(filter.isOnlyStocked())
+			c.add( Restrictions.eq("status", StockStatus.STOCKED) );
+		
+		if(filter.isOnlyFifo())
+			c.add( Restrictions.eq("inFifo", filter.isOnlyFifo() ) );
+		
+		if(filter.getId() > 0)
+			c.add(Restrictions.ge("id", filter.getId()));
+		
+		if(filter.getId_2() > 0)
+			c.add(Restrictions.le("id", filter.getId_2()));
+
+		if(filter.getProductId() > 0)
+			c.add(Restrictions.eq("product.id", filter.getProductId()));
+		
+		c.createAlias("product", "prod",Criteria.INNER_JOIN);
+		
+		if( filter.getIdMasc() != null && !filter.getIdMasc().isEmpty() )
+		{
+			
+			//Product product = GuiGlobals.getDaoFactory().getProductDao().findByIdMasc( filter.getIdMasc() );
+			
+			c.add(Restrictions.ge("prod.idMasc", filter.getIdMasc()));
+		}
+		
+		if( filter.getIdMasc_2() != null && !filter.getIdMasc_2().isEmpty() )
+		{
+			//Product product = GuiGlobals.getDaoFactory().getProductDao().findByIdMasc( filter.getIdMasc_2() );
+			c.add(Restrictions.le("prod.idMasc", filter.getIdMasc_2()));
 		}
 		
 		if ( filter.getCompanyIdDe() != null && !filter.getCompanyIdDe().isEmpty() )
@@ -446,6 +596,10 @@ public class DefaultStockDao implements StockDao
 			else 
 			{
 				StockTotal st = new StockTotal();
+				
+				//WJSP 26/07/2016
+				st.setCompany(s.getCompany());
+				
 				st.setNet(s.getNet());
 				st.setPrimaryQty(s.getPrimaryQty());
 				st.setProduct(s.getProduct());
@@ -1083,11 +1237,11 @@ public class DefaultStockDao implements StockDao
 		
 		        //Cria as células na linha
 		        cabecalho.createCell(0).setCellValue("PRODUTO");
-		        cabecalho.createCell(1).setCellValue("DESCRIÇÃO");
-		        cabecalho.createCell(2).setCellValue("EMBALAGENS");
-		        cabecalho.createCell(3).setCellValue("CAIXAS");
-		        cabecalho.createCell(4).setCellValue("PEÇAS");	        
-		        cabecalho.createCell(5).setCellValue("PESO LÍQUIDO (kg)");
+		        cabecalho.createCell(1).setCellValue("EMBALAGENS");
+
+		        cabecalho.createCell(2).setCellValue("CAIXAS");
+		        cabecalho.createCell(3).setCellValue("PEÇAS");	        
+		        cabecalho.createCell(4).setCellValue("PESO LÍQUIDO (kg)");
 		
 		        int totEmb = 0;
 		        int secondaryQty = 0;
@@ -1099,12 +1253,12 @@ public class DefaultStockDao implements StockDao
 		        for ( StockTotal total : totais)
 		        {
 			        dados = sheet.createRow( linha );
-			        dados.createCell(0).setCellValue(total.getProduct().getIdMasc());
-			        dados.createCell(1).setCellValue(total.getProduct().getDescription());
-			        dados.createCell(2).setCellValue(total.getTotEmb());
-			        dados.createCell(3).setCellValue(total.getSecondaryQty());
-			        dados.createCell(4).setCellValue(total.getPrimaryQty());		        
-			        dados.createCell(5).setCellValue(total.getNet());
+			        dados.createCell(0).setCellValue(total.getProduct().toString());
+			        dados.createCell(1).setCellValue(total.getTotEmb());
+
+			        dados.createCell(2).setCellValue(total.getSecondaryQty());
+			        dados.createCell(3).setCellValue(total.getPrimaryQty());		        
+			        dados.createCell(4).setCellValue(total.getNet());
 			        linha++;
 			        
 			        totEmb += total.getTotEmb();
@@ -1116,10 +1270,10 @@ public class DefaultStockDao implements StockDao
 		        
 		        dados = sheet.createRow( linha );
 		        dados.createCell(0).setCellValue("TOTAL");
-		        dados.createCell(2).setCellValue(totEmb);
-		        dados.createCell(3).setCellValue(secondaryQty);
-		        dados.createCell(4).setCellValue(primaryQty);		        
-		        dados.createCell(5).setCellValue(net);
+		        dados.createCell(1).setCellValue(totEmb);
+		        dados.createCell(2).setCellValue(secondaryQty);
+		        dados.createCell(3).setCellValue(primaryQty);		        
+		        dados.createCell(4).setCellValue(net);
 	        	
 		        wb.write(stream);
 		        stream.flush();
@@ -1170,13 +1324,14 @@ public class DefaultStockDao implements StockDao
 		        cabecalho.createCell(0).setCellValue("FILIAL");
 		        cabecalho.createCell(1).setCellValue("NR. SÉRIE");
 		        cabecalho.createCell(2).setCellValue("PRODUTO");
-		        cabecalho.createCell(3).setCellValue("EMBALAGENS");
-		        cabecalho.createCell(4).setCellValue("CAIXAS");
-		        cabecalho.createCell(5).setCellValue("PEÇAS");	        
-		        cabecalho.createCell(6).setCellValue("PESO LÍQUIDO (kg)");
-		        cabecalho.createCell(7).setCellValue("TIPO ESTOQUE");
-		        cabecalho.createCell(8).setCellValue("PALETE");
-		        cabecalho.createCell(9).setCellValue("FLAG");
+		        cabecalho.createCell(3).setCellValue("DESCRIÇÃO");
+		        cabecalho.createCell(4).setCellValue("EMBALAGENS");
+		        cabecalho.createCell(5).setCellValue("CAIXAS");
+		        cabecalho.createCell(6).setCellValue("PEÇAS");
+		        cabecalho.createCell(7).setCellValue("PESO LÍQUIDO (kg)");
+		        cabecalho.createCell(8).setCellValue("TIPO ESTOQUE");
+		        cabecalho.createCell(9).setCellValue("PALETE");
+		        cabecalho.createCell(10).setCellValue("FLAG");
 		
 		        int totEmb = 0;
 		        int secondaryQty = 0;
@@ -1189,15 +1344,17 @@ public class DefaultStockDao implements StockDao
 		        {
 			        dados = sheet.createRow( linha );
 			        dados.createCell(0).setCellValue(stock.getCompany().getId());
-			        dados.createCell(1).setCellValue(stock.getIdFormatSerial());
-			        dados.createCell(2).setCellValue(stock.getProduct().toString());
-			        dados.createCell(3).setCellValue(1);		        
-			        dados.createCell(4).setCellValue(stock.getSecondaryQty());
-			        dados.createCell(5).setCellValue(stock.getPrimaryQty());
-			        dados.createCell(6).setCellValue(stock.getNet());
-			        dados.createCell(7).setCellValue(stock.getTypeStock().getDescricao());
-			        dados.createCell(8).setCellValue( ( ( stock.getPallet() == null ) ? Utils.formatPallet(0): stock.getPallet().getIdFormatted() ) );
-			        dados.createCell(9).setCellValue(stock.getOperation());
+			        dados.createCell(1).setCellValue(stock.getIdFormatSerial());			        			        
+			        dados.createCell(2).setCellValue(stock.getProduct().getIdMasc());
+
+			        dados.createCell(3).setCellValue(stock.getProduct().getDescription());
+			        dados.createCell(4).setCellValue(1);		        
+			        dados.createCell(5).setCellValue(stock.getSecondaryQty());
+			        dados.createCell(6).setCellValue(stock.getPrimaryQty());
+			        dados.createCell(7).setCellValue(stock.getNet());
+			        dados.createCell(8).setCellValue(stock.getTypeStock().getDescricao());
+			        dados.createCell(9).setCellValue( ( ( stock.getPallet() == null ) ? Utils.formatPallet(0): stock.getPallet().getIdFormatted() ) );
+			        dados.createCell(10).setCellValue(stock.getOperation());
 			        linha++;
 			        
 			        totEmb += 1;
@@ -1210,12 +1367,14 @@ public class DefaultStockDao implements StockDao
 		        dados.createCell(0).setCellValue("TOTAL");
 		        dados.createCell(1).setCellValue("");
 		        dados.createCell(2).setCellValue("");
-		        dados.createCell(3).setCellValue(totEmb);		        
-		        dados.createCell(4).setCellValue(secondaryQty);
-		        dados.createCell(5).setCellValue(primaryQty);
-		        dados.createCell(6).setCellValue(net);
-		        dados.createCell(7).setCellValue("");
+		        dados.createCell(3).setCellValue("");
+		        dados.createCell(4).setCellValue(totEmb);		        
+		        dados.createCell(5).setCellValue(secondaryQty);
+		        dados.createCell(6).setCellValue(primaryQty);
+		        dados.createCell(7).setCellValue(net);
 		        dados.createCell(8).setCellValue("");
+		        dados.createCell(9).setCellValue("");
+		        dados.createCell(10).setCellValue("");
 	        	
 		        wb.write(stream);
 		        stream.flush();

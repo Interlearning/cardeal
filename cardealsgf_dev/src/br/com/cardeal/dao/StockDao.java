@@ -60,6 +60,9 @@ public interface StockDao {
 	Pallet getPalletForStocked(Product product, Terminal terminal,Company company, boolean questionNewPallet);
 	List<Stock> listStockOfPalletStocked(int palletId);
 	
+	// WJSP 29/07/1987
+	public List<Stock> listWeb(StockFilter filter);
+	
 	Pallet findPalletStocked(int palletId);
 	Pallet findLastPalletStocked(Terminal terminal, Company company) ;
 	Stock findStocked(long id);

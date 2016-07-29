@@ -1,5 +1,7 @@
 package br.com.cardeal.model;
 
+import java.util.List;
+
 import br.com.cardeal.globals.NumberUtils;
 
 public class StockTotal {
@@ -15,6 +17,12 @@ public class StockTotal {
 	private double net = 0.0;
 	
 	private double tare = 0.0;
+	
+	/* WJSP 26/07/2016
+	 * Colocaldo Company na classe para apresentação da Filial no relatório Web Estoque Totalizado
+	 * @see private  List<StockTotal> totalize(List<Stock> stocks, Pallet pallet)  DefaultStockDao.java
+	 */
+	private Company company;
 
 	public Product getProduct() {
 		return product;
@@ -68,4 +76,12 @@ public class StockTotal {
 		this.totEmb = totEmb;
 	}
 	
+	// WJSP 26/07/2016
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
+	}	
 }
