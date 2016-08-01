@@ -186,45 +186,6 @@
 								</tbody>
 							</table>
 							<br>
-							<div class="row">
-								<div class="col-md-8 col-md-offset-2">
-								
-									<form	name="form_anterior" method="post"
-											action="<c:url value='/stocks/palletsBack'/>">
-											
-											<input type="hidden" id="companyId" value="${companyId}" />
-											<input type="hidden" id="companyId2" value="${companyId2}" />
-											<input type="hidden" id="terminalId" value="${terminalId}" />
-											<input type="hidden" id="terminalId2" value="${terminalId2}" />
-											<input type="hidden" id="productIdMascDe"  value="${idMasc}" />
-											<input type="hidden" id="productIdMascAte"  value="${idMasc_2}" />
-											<input type="hidden" id="palletIdDe"  value="${palletIdDe}" />
-											<input type="hidden" id="palletIdAte"  value="${palletIdAte}" />
-											<input type="hidden" id="manufactureDateDe"  value="${date3}" />
-											<input type="hidden" id="manufactureDateAte" value="${date4}" />
-											<input type="hidden" id="typeStock" value="${typeStock}" />																
-											<input type="submit" value="Voltar ${qtyPerPage} registros" class="btn btn-md btn-default pull-left"/>
-									</form>
-									
-									<form	name="form_proximo" method="post"
-											action="<c:url value='/stocks/palletsForward'/>">
-											
-											<input type="hidden" id="companyId" value="${companyId}" />
-											<input type="hidden" id="companyId2" value="${companyId2}" />
-											<input type="hidden" id="terminalId" value="${terminalId}" />
-											<input type="hidden" id="terminalId2" value="${terminalId2}" />
-											<input type="hidden" id="productIdMascDe"  value="${idMasc}" />
-											<input type="hidden" id="productIdMascAte"  value="${idMasc_2}" />
-											<input type="hidden" id="palletIdDe"  value="${palletIdDe}" />
-											<input type="hidden" id="palletIdAte"  value="${palletIdAte}" />
-											<input type="hidden" id="manufactureDateDe"  value="${date3}" />
-											<input type="hidden" id="manufactureDateAte" value="${date4}" />
-											<input type="hidden" id="typeStock" value="${typeStock}" />																	
-											<input type="submit" value="Avançar ${qtyPerPage} registros" class="btn btn-md btn-inverse pull-right"/>
-									</form>
-																						
-								</div>
-							</div>
 							</section>
 							<footer> </footer>
 						</div>

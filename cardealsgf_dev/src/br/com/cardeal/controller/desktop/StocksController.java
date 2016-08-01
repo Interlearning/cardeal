@@ -247,7 +247,7 @@ public class StocksController {
 			if(showTotal) 
 			{
 				filter.setLimitPage(false);
-				List<StockTotal> totals = GuiGlobals.getDaoFactory().getStockDao().totalize(filter);
+				List<StockTotalReport> totals = GuiGlobals.getDaoFactory().getStockDao().listSumStocked(filter, true);
 		        result.include("totals", totals);
 			}
 			else 
@@ -275,6 +275,10 @@ public class StocksController {
 
 		List<StockTotalReport> totalGeral = GuiGlobals.getDaoFactory().getStockDao().listSumStocked(filter, false);
 		
+		if ( totalGeral == null  )
+		{
+			totalGeral = new ArrayList<StockTotalReport>();
+		}
 		
 		/* Set nas variaveis ${nome_da_var} do list.jsp
 		 * result.include("companyIdDe", filter.getCompanyIdDe());

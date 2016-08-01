@@ -4,13 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
-import br.com.cardeal.globals.HibernateUtil;
-import br.com.cardeal.model.Stock;
 import br.com.cardeal.printer.PrintSerial;
 
 public class testaCodigo 
@@ -18,39 +12,8 @@ public class testaCodigo
 
 	public static void main(String... args)
 	{
-		//testingPrinter();
-		testHBN();
+		testingPrinter();
 	}
-	
-	
-	private static void testHBN(){
-		
-		Session session = HibernateUtil.getSession();
-		
-		Criteria c = session.createCriteria(Stock.class, "stock");	
-		c.createAlias("product","prod",Criteria.INNER_JOIN);
-		
-		c.add(Restrictions.ge("prod.idMasc",0));
-		c.add(Restrictions.le("prod.idMasc", 109));
-		
-		/*
-		c.add(Restrictions.ge("product.id",0));
-			
-		c.add(Restrictions.ge("product.id",0));  // ok para idMasc
-				
-		c.add(Restrictions.le("product.id", 109)); // ok para idMasc
-		*/
-		
-		c.addOrder(Order.asc("id"));
-		c.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP).list();
-		
-		String teste = "01";
-		
-		teste = teste;
-	}
-	
-	
-	
 	
 	private static void testingPrinter() 
 	{
